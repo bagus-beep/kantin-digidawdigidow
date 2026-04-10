@@ -155,45 +155,51 @@ function renderSkeleton(){
   grid.innerHTML = Array(4).fill(0).map(()=>`<div class="glass rounded-2xl h-44 skeleton"></div>`).join('');
 }
 
+function productCard(p, i) {
+  const lowStock = p.stock <= 5;
+  const outStock = p.stock <= 0;
+
+  return `
+  <div class="card ${outStock ? 'opacity-50' : ''}">
+    
+    <div class="relative">
+      <img src="${p.img}" class="w-full card-img" />
+      
+      ${lowStock ? `<span class="badge badge-low">Low</span>` : ''}
+      ${outStock ? `<span class="badge badge-out">Habis</span>` : ''}
+    </div>
+
+    <div class="card-body">
+      
+      <p class="text-[10px] opacity-50">${p.kategori}</p>
+
+      <h2 class="product-name">${p.name}</h2>
+
+      <div class="card-meta">
+        <span class="text-gold font-bold">${rupiah(p.price)}</span>
+        <span class="opacity-50">Stok ${p.stock}</span>
+      </div>
+
+      <button onclick="add(${i})"
+        class="${outStock ? 'btn-disabled' : 'btn-primary'}">
+        ${outStock ? 'Habis' : '+ Keranjang'}
+      </button>
+
+    </div>
+  </div>`;
+}
+
 function render(){
   let data = PRODUCTS
-    .filter(p=>STATE.filter==='ALL'||p.kategori===STATE.filter)
-    .filter(p=>p.name.toLowerCase().includes(STATE.search));
+    .filter(p => STATE.filter==='ALL'||p.kategori===STATE.filter)
+    .filter(p => p.name.toLowerCase().includes(STATE.search));
 
   if(!data.length){
-    grid.innerHTML = `<p class="text-center col-span-2 text-gray-400">Produk tidak ditemukan</p>`;
+    grid.innerHTML = `<p class="text-center col-span-2 opacity-50">Produk tidak ditemukan</p>`;
     return;
   }
 
-  grid.innerHTML = data.map((p,i)=>{
-    const lowStock = p.stock <= 5;
-    const outStock = p.stock <= 0;
-    return `
-      <div class="glass rounded-2xl overflow-hidden fade-in ripple card-fixed ${outStock ? 'opacity-50' : ''}">
-        <div class="relative flex-shrink-0 h-[120px]">
-          <img src="${p.img}" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmM2YzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='" />
-          ${lowStock ? '<span class="absolute top-2 left-2 bg-yellow-500 text-black text-[10px] px-2 py-1 rounded font-bold">Low Stock</span>' : ''}
-          ${outStock ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded font-bold">Habis</span>' : ''}
-        </div>
-        <div class="card-content">
-          <div>
-            <p class="text-[10px] opacity-50 mb-1">${p.kategori}</p>
-            <h2 class="product-name text-sm font-semibold">${p.name}</h2>
-          </div>
-          <div class="flex items-center justify-between text-xs mt-auto">
-            <p class="text-gold font-bold">${rupiah(p.price)}</p>
-            <span class="text-gray-400">Stok: ${p.stock}</span>
-          </div>
-          <button onclick="add(${i}, event)" 
-            ${outStock ? 'disabled' : ''} 
-            class="mt-3 w-full py-2.5 rounded-xl font-semibold premium-btn ${outStock ? 'opacity-50 cursor-not-allowed' : ''}">
-
-            ${outStock ? 'Habis' : '+ Keranjang'}
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
+  grid.innerHTML = data.map(productCard).join('');
 }
 
 function add(i, e) {
