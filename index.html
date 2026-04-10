@@ -23,17 +23,28 @@ tailwind.config = {
 <script src="js/app.js" defer></script>
 </head>
 
-<body class="text-white">
+<body class="text-white bg-gradient-to-b from-primary to-slate-900">
 
-<header class="sticky top-0 z-50 glass p-3 space-y-2">
-  <h1 id="headerTitle" class="text-lg font-bold text-gold">Kantin Digital</h1>
+<div class="max-w-md mx-auto">
 
-  <input id="searchInput" placeholder="🔍 Cari makanan..." class="w-full glass px-3 py-2 rounded-xl text-sm focus:ring-2 focus:ring-gold outline-none mb-3" />
+<header class="sticky top-0 z-50 glass px-4 py-3 space-y-3">
+  <h1 id="headerTitle" class="text-xl font-bold text-gold tracking-wide">
+    Kantin Digital
+  </h1>
 
-  <div id="filterBar" class="flex gap-2 overflow-x-auto"></div>
+  <div class="relative">
+    <input id="searchInput"
+      placeholder="Cari makanan..."
+      class="w-full glass pl-10 pr-3 py-2 rounded-xl text-sm focus:ring-2 focus:ring-gold outline-none" />
+    <span class="absolute left-3 top-1/2 -translate-y-1/2 opacity-50">🔍</span>
+  </div>
+
+  <div id="filterBar" class="flex gap-2 overflow-x-auto pb-1"></div>
 </header>
 
-<main id="grid" class="p-4 grid grid-cols-2 gap-4 pb-24"></main>
+<main id="grid" class="p-4 grid grid-cols-2 gap-4 pb-28"></main>
+
+</div>
 
 <!-- CART -->
 <div id="cartModal" class="fixed inset-0 bg-black/60 hidden flex items-end z-50">
