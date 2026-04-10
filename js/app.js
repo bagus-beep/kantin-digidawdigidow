@@ -29,7 +29,6 @@ async function init(){
   }).catch(err => {
     console.error('Load error:', err);
     toast('Error loading data, using cached/fallback');
-    renderFallback();
     updateUpsell();
   });
   
@@ -100,7 +99,6 @@ async function loadProducts(){
     updateUpsell();
   } catch(e){
     console.error('Products load error:', e);
-    renderFallback();
     updateUpsell();
   }
 }
@@ -109,20 +107,6 @@ function setHeader(name){
   const header = document.querySelector('header h1');
   if(header) header.textContent = name;
 }
-
-function renderFallback(){
-  // Hardcoded fallback
-  PRODUCTS = [
-    {id:'1', name:"MAKARONI", price:5000, kategori:"MAKANAN", img:"https://via.placeholder.com/300x150/f0f0f0/999?text=No+Image", stock:10},
-    {id:'2', name:"LE MINERAL", price:4000, kategori:"MINUMAN", img:"https://via.placeholder.com/300x150/f0f0f0/999?text=No+Image", stock:20},
-    {id:'3', name:"OREO", price:3000, kategori:"MAKANAN", img:"https://via.placeholder.com/300x150/f0f0f0/999?text=No+Image", stock:5},
-    {id:'4', name:"MILO", price:5000, kategori:"MINUMAN", img:"https://via.placeholder.com/300x150/f0f0f0/999?text=No+Image", stock:15}
-  ];
-  renderFilter();
-  render();
-  updateUpsell();
-}
-
 
 function bindEvents(){
   document.getElementById('searchInput').addEventListener('input', e=>{
@@ -174,7 +158,8 @@ function render(){
           </div>
           <button onclick="add(${i})" 
             ${outStock ? 'disabled' : ''} 
-            class="mt-2 w-full py-2 rounded-xl font-semibold shadow transition-all ${outStock ? 'bg-gray-500 cursor-not-allowed' : 'bg-gold text-black active:scale-95'}">
+class="mt-2 w-full py-2 rounded-xl font-semibold premium-btn ${outStock ? 'bg-gray-500 cursor-not-allowed opacity-50' : ''}">
+
             ${outStock ? 'Habis' : '+ Keranjang'}
           </button>
         </div>
