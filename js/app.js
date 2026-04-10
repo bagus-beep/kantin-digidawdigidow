@@ -1,6 +1,16 @@
 // js/app.js - Minimal Initialization Only
 init();
 
+async function loadPartner() {
+  try {
+    const res = await fetch('data/partners.json');
+    PARTNER = await res.json();
+    setHeader(PARTNER[0]?.mitra_name || 'Kantin Digital');
+  } catch (e) {
+    console.warn('Partner load skipped:', e);
+  }
+}
+
 function goHome() {
   console.log('Go to Home');
 }
@@ -13,13 +23,12 @@ function goAccount() {
   alert('Fitur Akun akan segera hadir!');
 }
 
-async function init() {
-  renderSkeleton();
+function init() {
+  renderSkeleton();  
   bindEvents();
   updateCount();
-  updateNavCount();
   
-  // Load initial data
+  // Load data
   Promise.all([
     loadPartner(),
     loadProducts()
@@ -32,7 +41,7 @@ async function init() {
     toast('Error loading data');
   });
   
-  // Auto refresh every 30s
+  // Auto refresh
   setInterval(loadProducts, 30000);
 }
 
