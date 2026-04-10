@@ -1,47 +1,47 @@
-let PRODUCTS = [];
-let PARTNER = null;
-let CACHED_DATA = null;
-const CACHE_KEY = 'kantin_data';
-const CACHE_EXPIRY = 3600000; // 1 hour
-
-
-const STATE = {
-  filter:'ALL',
-  cart: JSON.parse(localStorage.getItem('cart')||'[]'),
-  search:''
-};
-
-const grid = document.getElementById('grid');
-
+// js/app.js - App Initialization (Slim)
 init();
 
-async function init(){
+function goHome() {
+  console.log('Go to Home');
+}
+
+function goTransaction() {
+  alert('Fitur Transaksi akan segera hadir!');
+}
+
+function goAccount() {
+  alert('Fitur Akun akan segera hadir!');
+}
+
+async function init() {
   renderSkeleton();
   bindEvents();
   updateCount();
   updateNavCount();
   
   // Load data
-  Promise.all([loadPartner(), loadProducts()]).then(() => {
+  Promise.all([
+    loadPartner(),
+    loadProducts()
+  ]).then(() => {
     renderFilter();
     render();
     updateUpsell();
   }).catch(err => {
     console.error('Load error:', err);
-    toast('Error loading data, using cached/fallback');
-    updateUpsell();
+    toast('Error loading data');
   });
   
-  // Auto refresh
+  // Auto refresh products
   setInterval(loadProducts, 30000);
 }
 
-async function loadPartner(){
+async function loadPartner() {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
-    if(cached){
+    if (cached) {
       const data = JSON.parse(cached);
-      if(Date.now() - data.timestamp < CACHE_EXPIRY){
+      if (Date.now() - data.timestamp < CACHE_EXPIRY) {
         PARTNER = data.partner;
         setHeader(PARTNER?.mitra_name || 'Kantin Digital');
         return;
@@ -56,11 +56,12 @@ async function loadPartner(){
       timestamp: Date.now()
     }));
     setHeader(PARTNER.mitra_name);
-  } catch(e){
+  } catch (e) {
     console.error('Partner load error:', e);
     setHeader('Kantin Digital');
   }
 }
+
 
 async function loadProducts(){
   try {
