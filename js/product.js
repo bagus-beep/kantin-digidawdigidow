@@ -13,16 +13,16 @@ async function loadProducts() {
       }
     }
     
-    const res = await fetch('data/partners.json');
+    const res = await fetch('data/products.json');
     const rawProducts = await res.json();
     
     PRODUCTS = rawProducts.map(p => ({
       id: p.produk_id,
       name: p.produk_name,
-      price: parseInt(p.produk_price.replace(/\./g, '')),
-      kategori: p.produk_kategori,
-      img: p.produk_image,
-      stock: parseInt(p.produk_stock)
+      price: parseInt((p.produk_price || '0').replace(/\./g, '')),
+      kategori: p.produk_kategori || 'MAKANAN',
+      img: p.produk_image || '',
+      stock: parseInt(p.produk_stock || '0')
     })).filter(p => p.stock > 0 || true); // show all, even 0 stock
     
     localStorage.setItem(CACHE_KEY, JSON.stringify({
