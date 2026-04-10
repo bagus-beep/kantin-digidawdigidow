@@ -60,10 +60,12 @@ tailwind.config = {
       </div>
     </div>
 
-    <div class="border-t border-white/10 mt-3 pt-3 sticky bottom-0 bg-primary">
-      <p id="total" class="font-bold text-gold mb-2"></p>
-      <button onclick="checkout()" class="w-full bg-gold text-black py-3 rounded-xl font-semibold shadow-lg active:scale-95">Checkout</button>
+
+    <div class="cart-checkout border-t border-white/10 mt-3 pt-3 sticky bottom-0">
+      <p id="total" class="font-bold text-primary mb-2"></p>
+      <button onclick="checkout()" class="w-full bg-primary text-gold py-3 rounded-xl font-bold premium-btn shadow-2xl active:scale-95 text-lg">Checkout Sekarang</button>
     </div>
+
   </div>
 </div>
 
@@ -71,13 +73,13 @@ tailwind.config = {
 <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 hidden bg-gold text-black px-4 py-2 rounded-xl text-sm"></div>
 
 <!-- Bottom Navigation -->
-<nav class="fixed bottom-0 left-0 right-0 bg-primary/95 backdrop-blur-md border-t border-white/10 z-40 px-4 py-2">
+    <nav class="fixed bottom-0 left-0 right-0 bg-primary/95 backdrop-blur-md border-t border-white/10 z-40 px-4 py-2 pb-[env(safe-area-inset-bottom)]">
   <div class="max-w-md mx-auto flex justify-around items-center h-16 text-sm">
     <a href="#" onclick="goHome()" class="flex flex-col items-center text-gold active:scale-95 transition-all">
       <span class="text-xl mb-1">🏠</span>
       <span>Beranda</span>
     </a>
-    <a href="#" onclick="toggleCart(true)" class="flex flex-col items-center text-white/70 hover:text-gold active:scale-95 transition-all relative">
+    <a href="#" onclick="toggleCart(true)" class="flex flex-col items-center premium-btn-nav text-white/70 hover:text-gold active:scale-95 transition-all relative">
       <span class="text-xl mb-1">🛒</span>
       <span>Keranjang</span>
       <span id="navCount" class="absolute -top-1 -right-1 bg-gold text-black text-xs px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center hidden">0</span>
@@ -95,4 +97,3 @@ tailwind.config = {
 
 </body>
 </html>
-
