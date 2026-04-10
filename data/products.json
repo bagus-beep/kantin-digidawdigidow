@@ -1,0 +1,232 @@
+[
+  {
+    "produk_id": "0a23ea80-b92f-4dad-80ea-b952e1ae16de",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "MAKARONI ASEP",
+    "produk_price": "500",
+    "produk_stock": "30",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "3682253f-039f-4c74-990a-960c1566058d",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "BONCABE MAKARONI KRISPI",
+    "produk_price": "3.000",
+    "produk_stock": "10",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "379ba5e6-cce6-4051-bcac-4b5c49e893ac",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "MIKAKO",
+    "produk_price": "2.000",
+    "produk_stock": "15",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "5078504f-4d0d-4b40-9703-fe54f5235f48",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "LE MINERAL",
+    "produk_price": "4.000",
+    "produk_stock": "20",
+    "produk_kategori": "MINUMAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "60343e19-75e7-4541-905b-a305b260dc1d",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "DRINK BENG BENG",
+    "produk_price": "5.000",
+    "produk_stock": "10",
+    "produk_kategori": "MINUMAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "65a6f23c-26f6-41ad-b2a7-56c2d624dd7a",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "OREO",
+    "produk_price": "3.000",
+    "produk_stock": "5",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "683ff442-8aa8-48c7-9134-e01f3d3e77f6",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "OTAK OTAKKU GAGA",
+    "produk_price": "1.500",
+    "produk_stock": "25",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "6bb44df2-9c83-4fbc-975d-a365568a44ba",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "DANCOW",
+    "produk_price": "7.000",
+    "produk_stock": "14",
+    "produk_kategori": "MINUMAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "6cfe8045-bd72-422e-b185-1580963f90d4",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "FEILALA",
+    "produk_price": "3.000",
+    "produk_stock": "12",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "720adcbb-2ae8-4f0b-a059-3ec8c8803c03",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "NABATI COKELAT",
+    "produk_price": "3.000",
+    "produk_stock": "10",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "741ba17d-80ee-41cd-b72a-892c5b0d4ed2",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "NIPIS MADU",
+    "produk_price": "5.000",
+    "produk_stock": "10",
+    "produk_kategori": "MINUMAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "7880e88a-7056-4bc7-bcd7-0a990246f3ff",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "PIZZA",
+    "produk_price": "6.000",
+    "produk_stock": "7",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "7a7f6365-d5db-400a-bf57-395fa46668bb",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "KALPA",
+    "produk_price": "3.000",
+    "produk_stock": "7",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "8acc74fe-0d8c-451f-a25c-bedc230207e4",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "CHOCOLATOS SNACK",
+    "produk_price": "2.000",
+    "produk_stock": "15",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "96fb28c2-bf7d-4c6c-ad88-812fbf20e009",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "MIE SEDAP CUP SELECTION",
+    "produk_price": "8.000",
+    "produk_stock": "5",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "9c2e1473-8f1a-49d1-a55e-df07ebe5daa2",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "CHOCOLATOS",
+    "produk_price": "5.000",
+    "produk_stock": "7",
+    "produk_kategori": "MINUMAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "a56bea6b-eeef-4127-98d3-9477f6114d33",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "PIE SUSUS CHANDRA",
+    "produk_price": "2.500",
+    "produk_stock": "15",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "b0d3e036-01d0-44ed-a5b1-e90d4c5eb6fd",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "SARI GANDUM",
+    "produk_price": "3.000",
+    "produk_stock": "6",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "cb97361b-94bc-498c-835d-ba03664aa4f6",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "DILAN ",
+    "produk_price": "3.000",
+    "produk_stock": "12",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "ce0d4b39-aba6-4b8f-92af-2b4b67097b98",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "MILO",
+    "produk_price": "5.000",
+    "produk_stock": "15",
+    "produk_kategori": "MINUMAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "ce55f09d-fc77-4196-b0e8-2d4813607ec1",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "TAIKO KREZZ",
+    "produk_price": "3.000",
+    "produk_stock": "8",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "d65f2d6f-ed9d-43a0-8c86-f3826a603cf0",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "TEBS",
+    "produk_price": "8.000",
+    "produk_stock": "15",
+    "produk_kategori": "MINUMAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  },
+  {
+    "produk_id": "d9a00ad4-638d-4a12-8f31-b21193fe0b43",
+    "mitra_id": "af1c1c05-1c86-4377-ab86-3fc67fc9e23c",
+    "produk_name": "BENG BENG",
+    "produk_price": "3.000",
+    "produk_stock": "5",
+    "produk_kategori": "MAKANAN",
+    "produk_image": "https://lh3.googleusercontent.com/d/1HewhlwK3IzeilNHYBuXBav8U8OyAOM4x",
+    "sekolah": "SMA HANG TUAH 2 SIDOARJO"
+  }
+]

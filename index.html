@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kantin Bu Ning - Premium</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#020617',
+        accent: '#1e3a8a',
+        gold: '#fbbf24'
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/app.js" defer></script>
+</head>
+
+<body class="text-white">
+
+<header class="p-4 glass sticky top-0 z-50">
+  <h1 id="headerTitle" class="text-lg font-bold text-gold">Kantin Digital</h1>
+</header>
+
+<div class="p-3">
+  <input id="searchInput" placeholder="🔍 Cari makanan..." class="w-full glass px-3 py-2 rounded-xl text-sm focus:ring-2 focus:ring-gold outline-none" />
+</div>
+
+<div id="filterBar" class="flex gap-2 px-3 overflow-x-auto sticky top-[72px] z-40"></div>
+
+  <main id="grid" class="p-4 grid grid-cols-2 gap-4 pb-24"></main>
+
+<!-- CART -->
+<div id="cartModal" class="fixed inset-0 bg-black/60 hidden flex items-end z-50">
+  <div class="glass w-full rounded-t-2xl p-4 max-h-[80%] overflow-auto">
+    <div class="flex justify-between mb-2">
+      <h2 class="text-gold font-bold">Keranjang</h2>
+      <button onclick="toggleCart(false)">✕</button>
+    </div>
+
+    <div id="cartItems"></div>
+
+    <div id="emptyCart" class="text-center opacity-50 py-6 hidden">
+      🛒 Keranjang masih kosong
+    </div>
+
+    <!-- UPSELL Compact Mobile -->
+    <div id="upsell" class="hidden p-2 bg-gradient-to-r from-gold/20 to-accent/20 border border-gold/30 rounded-xl text-xs shadow-lg mx-1">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5" id="upsellContent">
+          <span class="text-gold text-lg">🔥</span>
+          <span class="font-medium">Loading...</span>
+        </div>
+        <button onclick="addUpsell()" id="upsellBtn" class="bg-gold text-black px-3 py-1.5 rounded-full font-semibold text-xs shadow-md hover:scale-105 active:scale-95 transition-all whitespace-nowrap disabled:opacity-50">+ Tambah</button>
+      </div>
+    </div>
+
+    <div class="border-t border-white/10 mt-3 pt-3 sticky bottom-0 bg-primary">
+      <p id="total" class="font-bold text-gold mb-2"></p>
+      <button onclick="checkout()" class="w-full bg-gold text-black py-3 rounded-xl font-semibold shadow-lg active:scale-95">Checkout</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 hidden bg-gold text-black px-4 py-2 rounded-xl text-sm"></div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 bg-primary/95 backdrop-blur-md border-t border-white/10 z-40 px-4 py-2">
+  <div class="max-w-md mx-auto flex justify-around items-center h-16 text-sm">
+    <a href="#" onclick="goHome()" class="flex flex-col items-center text-gold active:scale-95 transition-all">
+      <span class="text-xl mb-1">🏠</span>
+      <span>Beranda</span>
+    </a>
+    <a href="#" onclick="toggleCart(true)" class="flex flex-col items-center text-white/70 hover:text-gold active:scale-95 transition-all relative">
+      <span class="text-xl mb-1">🛒</span>
+      <span>Keranjang</span>
+      <span id="navCount" class="absolute -top-1 -right-1 bg-gold text-black text-xs px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center hidden">0</span>
+    </a>
+    <a href="#" onclick="goTransaction()" class="flex flex-col items-center text-white/70 hover:text-gold active:scale-95 transition-all">
+      <span class="text-xl mb-1">📋</span>
+      <span>Transaksi</span>
+    </a>
+    <a href="#" onclick="goAccount()" class="flex flex-col items-center text-white/70 hover:text-gold active:scale-95 transition-all">
+      <span class="text-xl mb-1">👤</span>
+      <span>Profile</span>
+    </a>
+  </div>
+</nav>
+
+</body>
+</html>
