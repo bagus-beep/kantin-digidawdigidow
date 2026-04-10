@@ -109,9 +109,35 @@ function setHeader(name){
 }
 
 function bindEvents(){
-  document.getElementById('searchInput').addEventListener('input', e=>{
-    STATE.search = e.target.value.toLowerCase();
-    render();
+  const searchInput = document.getElementById('searchInput');
+  let debounceTimer;
+  
+  searchInput.addEventListener('input', e => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      STATE.search = e.target.value.toLowerCase();
+      render();
+    }, 300);
+    
+    // Show/hide clear button
+    if (e.target.value) {
+      if (!searchInput.nextElementSibling || !searchInput.nextElementSibling.classList.contains('clear-btn')) {
+        const clearBtn = document.createElement('button');
+        clearBtn.innerHTML = '❌';
+        clearBtn.className = 'clear-btn absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-lg';
+        clearBtn.onclick = () => {
+          searchInput.value = '';
+          STATE.search = '';
+          render();
+          searchInput.focus();
+        };
+        searchInput.parentNode.style.position = 'relative';
+        searchInput.parentNode.appendChild(clearBtn);
+      }
+    } else {
+      const clearBtn = searchInput.parentNode.querySelector('.clear-btn');
+      if (clearBtn) clearBtn.remove();
+    }
   });
 }
 
@@ -143,22 +169,24 @@ function render(){
     const lowStock = p.stock <= 5;
     const outStock = p.stock <= 0;
     return `
-      <div class="glass rounded-2xl overflow-hidden fade-in ${outStock ? 'opacity-50' : 'active:scale-95'} min-h-[220px]">
-        <div class="relative card">
-          <img src="${p.img}" class="h-28 w-full object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmM2YzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='" />
+      <div class="glass rounded-2xl overflow-hidden fade-in ripple card-fixed ${outStock ? 'opacity-50' : ''}">
+        <div class="relative flex-shrink-0 h-[120px]">
+          <img src="${p.img}" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmM2YzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='" />
           ${lowStock ? '<span class="absolute top-2 left-2 bg-yellow-500 text-black text-[10px] px-2 py-1 rounded font-bold">Low Stock</span>' : ''}
           ${outStock ? '<span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded font-bold">Habis</span>' : ''}
         </div>
-        <div class="p-3">
-          <p class="text-[10px] opacity-50">${p.kategori}</p>
-          <h2 class="text-sm font-semibold">${p.name}</h2>
-          <div class="flex items-center justify-between text-xs">
+        <div class="card-content">
+          <div>
+            <p class="text-[10px] opacity-50 mb-1">${p.kategori}</p>
+            <h2 class="product-name text-sm font-semibold">${p.name}</h2>
+          </div>
+          <div class="flex items-center justify-between text-xs mt-auto">
             <p class="text-gold font-bold">${rupiah(p.price)}</p>
             <span class="text-gray-400">Stok: ${p.stock}</span>
           </div>
-          <button onclick="add(${i})" 
+          <button onclick="add(${i}, event)" 
             ${outStock ? 'disabled' : ''} 
-class="mt-2 w-full py-2 rounded-xl font-semibold premium-btn ${outStock ? 'bg-gray-500 cursor-not-allowed opacity-50' : ''}">
+            class="mt-3 w-full py-2.5 rounded-xl font-semibold premium-btn ${outStock ? 'opacity-50 cursor-not-allowed' : ''}">
 
             ${outStock ? 'Habis' : '+ Keranjang'}
           </button>
@@ -168,7 +196,21 @@ class="mt-2 w-full py-2 rounded-xl font-semibold premium-btn ${outStock ? 'bg-gr
   }).join('');
 }
 
-function add(i){
+function add(i, e) {
+  if (e) {
+    // Ripple effect
+    const btn = e.target.closest('.ripple');
+    if (btn) {
+      btn.classList.add('ripple-active');
+      setTimeout(() => btn.classList.remove('ripple-active'), 600);
+    }
+    // Fly animation
+    const img = btn.closest('.card-fixed').querySelector('img');
+    if (img) {
+      flyToCart(img);
+    }
+  }
+
   const item = PRODUCTS[i];
   if(item.stock <= 0){
     toast('Stok habis!');
@@ -186,7 +228,24 @@ function add(i){
   }
   persist();
   animateCart();
-  toast('Ditambahkan ke keranjang');
+  toast('Ditambahkan ke keranjang!');
+}
+
+function flyToCart(img) {
+  const clone = img.cloneNode(true);
+  clone.classList.add('fly-item');
+  clone.style.left = img.getBoundingClientRect().left + 'px';
+  clone.style.top = img.getBoundingClientRect().top + 'px';
+  document.body.appendChild(clone);
+  
+  // Animate to cart position
+  requestAnimationFrame(() => {
+    clone.classList.add('animate-fly');
+  });
+  
+  setTimeout(() => {
+    document.body.removeChild(clone);
+  }, 600);
 }
 
 function animateCart(){
