@@ -25,16 +25,15 @@ tailwind.config = {
 
 <body class="text-white">
 
-<header class="p-4 glass sticky top-0 z-50">
+<header class="sticky top-0 z-50 glass p-3 space-y-2">
   <h1 id="headerTitle" class="text-lg font-bold text-gold">Kantin Digital</h1>
-</header>
 
-<header class="p-4 glass sticky top-[72px] z-40">
   <input id="searchInput" placeholder="🔍 Cari makanan..." class="w-full glass px-3 py-2 rounded-xl text-sm focus:ring-2 focus:ring-gold outline-none mb-3" />
+
   <div id="filterBar" class="flex gap-2 overflow-x-auto"></div>
 </header>
 
-  <main id="grid" class="p-4 grid grid-cols-2 gap-4 pb-24"></main>
+<main id="grid" class="p-4 grid grid-cols-2 gap-4 pb-24"></main>
 
 <!-- CART -->
 <div id="cartModal" class="fixed inset-0 bg-black/60 hidden flex items-end z-50">
