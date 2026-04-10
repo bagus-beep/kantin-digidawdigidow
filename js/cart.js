@@ -61,7 +61,7 @@ function checkout() {
   toast('Checkout berhasil');
 }
 
-let upsellProduct = null;
+// upsellProduct declared globally
 
 function updateUpsell() {
   const minuman = PRODUCTS.find(p => p.kategori === 'MINUMAN' && p.stock > 0);
