@@ -3,11 +3,15 @@ init();
 
 async function loadPartner() {
   try {
-    const res = await fetch('data/partners.json');
-    PARTNER = await res.json();
-    setHeader(PARTNER[0]?.mitra_name || 'Kantin Digital');
+    const res = await fetch('data/products.json');
+    const data = await res.json();
+    if (data[0]) {
+      PARTNER = { mitra_name: 'Kantin Digital' };
+      setHeader(PARTNER.mitra_name);
+    }
   } catch (e) {
     console.warn('Partner load skipped:', e);
+    setHeader('Kantin Digital');
   }
 }
 
