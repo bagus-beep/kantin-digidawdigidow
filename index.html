@@ -29,11 +29,10 @@ tailwind.config = {
   <h1 id="headerTitle" class="text-lg font-bold text-gold">Kantin Digital</h1>
 </header>
 
-<div class="p-3">
-  <input id="searchInput" placeholder="🔍 Cari makanan..." class="w-full glass px-3 py-2 rounded-xl text-sm focus:ring-2 focus:ring-gold outline-none" />
-</div>
-
-<div id="filterBar" class="flex gap-2 px-3 overflow-x-auto sticky top-[72px] z-40"></div>
+<header class="p-4 glass sticky top-[72px] z-40">
+  <input id="searchInput" placeholder="🔍 Cari makanan..." class="w-full glass px-3 py-2 rounded-xl text-sm focus:ring-2 focus:ring-gold outline-none mb-3" />
+  <div id="filterBar" class="flex gap-2 overflow-x-auto"></div>
+</header>
 
   <main id="grid" class="p-4 grid grid-cols-2 gap-4 pb-24"></main>
 
@@ -97,3 +96,4 @@ tailwind.config = {
 
 </body>
 </html>
+
