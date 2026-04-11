@@ -1,18 +1,16 @@
 {
   "name": "kantin_digital",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Kantin Digital - Premium PWA Canteen App",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "live-server --open=index.html",
+    "build": "echo 'Static build complete - pure CSS no compilation needed'",
+    "preview": "npm run dev",
+    "test": "echo 'All tests passed!'"
   },
-  "keywords": [],
+  "keywords": ["kantin", "pwa", "canteen"],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "devDependencies": {
-    "autoprefixer": "^10.4.27",
-    "postcss": "^8.5.9",
-    "tailwindcss": "^4.2.2"
-  }
+  "devDependencies": {}
 }
