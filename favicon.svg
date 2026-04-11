@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Kantin Bu Ning">
+  <defs>
+    <linearGradient id="bg" x1="18" y1="14" x2="110" y2="118" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffb84f"/>
+      <stop offset="1" stop-color="#ff7a00"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <circle cx="98" cy="30" r="16" fill="#fff3db" opacity=".9"/>
+  <path d="M29 37h18l9 39h34l8-28H54" fill="none" stroke="#2b221b" stroke-linecap="round" stroke-linejoin="round" stroke-width="10"/>
+  <circle cx="61" cy="92" r="8" fill="#2b221b"/>
+  <circle cx="92" cy="92" r="8" fill="#2b221b"/>
+  <path d="M31 54h20" stroke="#fff3db" stroke-linecap="round" stroke-width="8"/>
+</svg>

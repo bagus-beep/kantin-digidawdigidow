@@ -1,0 +1,19 @@
+{
+  "name": "Kantin Bu Ning Marketplace",
+  "short_name": "Kantin Bu Ning",
+  "description": "Marketplace kantin sekolah modern untuk pesan cepat via WhatsApp.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7efe5",
+  "theme_color": "#ff8a00",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
