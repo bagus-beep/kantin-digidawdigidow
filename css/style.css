@@ -382,11 +382,30 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* Toast & Overlay */
-.toast,
+.toast {
+  left: 50%;
+  bottom: 94px;
+  transform: translateX(-50%);
+  padding: var(--spacing-sm);
+  border-radius: 0.5rem;
+  background: var(--text-primary);
+  color: white;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateX(-50%) translateY(1rem);
+  transition: all var(--transition);
+}
+
 .cart-overlay {
   position: fixed;
-  z-index: 1001;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
+
 
 .toast {
   left: 50%;
@@ -445,3 +464,4 @@ a { text-decoration: none; color: inherit; }
 @media (min-width: 980px) {
   /* Add complex desktop hero/product styles if needed */
 }
+
