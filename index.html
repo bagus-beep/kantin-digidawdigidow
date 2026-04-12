@@ -9,8 +9,9 @@
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/style.css">
   <script type="module" src="js/app.js"></script>
+
 </head>
-<body>
+<body data-theme="light">
   <div class="page-chrome" aria-hidden="true">
     <div class="glow glow-one"></div>
     <div class="glow glow-two"></div>
@@ -18,213 +19,147 @@
   </div>
 
   <div class="app-shell">
-    <header class="topbar">
-      <a class="brand-lockup" href="#hero" aria-label="Kembali ke hero">
-        <span class="brand-mark">KB</span>
-        <span class="brand-copy">
-          <span class="eyebrow">Marketplace kantin sekolah</span>
-          <strong>Kantin Digital</strong>
-        </span>
-      </a>
-
-      <div class="topbar-actions">
-        <button id="scrollCatalogButton" class="ghost-button" type="button">Lihat katalog</button>
-        <button id="cartToggleButton" class="cart-chip" type="button" aria-expanded="false" aria-controls="cartPanel">
-          Keranjang
-          <span id="topCartCount">0</span>
-        </button>
-      </div>
-    </header>
-
-    <main class="content-stack">
-      <section id="hero" class="hero-card reveal">
-        <div class="hero-copy">
-          <p class="eyebrow">Belanja cepat untuk jam istirahat sekolah</p>
-          <h1 id="partnerName">Memuat kantin...</h1>
-          <p id="partnerTagline" class="hero-tagline">
-            Menghubungkan makanan dan minuman favorit sekolahmu dalam pengalaman belanja yang lebih rapi, cepat, dan nyaman.
-          </p>
-
-          <div class="hero-actions">
-            <button id="primaryCtaButton" class="primary-button" type="button">Belanja sekarang</button>
-            <button id="contactSellerButton" class="ghost-button" type="button">Hubungi penjual</button>
-          </div>
-
-          <div class="hero-badges">
-            <span id="schoolBadge" class="info-pill">Sekolah</span>
-            <span id="ownerBadge" class="info-pill">Pengelola</span>
-            <span id="deliveryBadge" class="info-pill">Pesan via WhatsApp</span>
+    <div class="pages">
+      <!-- Home Page -->
+      <section id="home" class="page active">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <p class="eyebrow">Belanja cepat untuk jam istirahat sekolah</p>
+            <h1 id="partnerName">Memuat kantin...</h1>
+            <p id="partnerTagline" class="hero-tagline">
+              Menghubungkan makanan dan minuman favorit sekolahmu.
+            </p>
+            <div class="hero-actions">
+              <button id="primaryCtaButton" class="primary-button" type="button">Belanja sekarang</button>
+              <button id="contactSellerButton" class="primary-button" type="button">Hubungi penjual</button>
+            </div>
           </div>
         </div>
 
-        <div class="hero-panel">
-          <div class="hero-stat-grid">
-            <article class="stat-card accent">
-              <span class="stat-label">Produk aktif</span>
-              <strong id="statProducts">0</strong>
-              <p>Menu siap dipesan hari ini</p>
-            </article>
-
-            <article class="stat-card">
-              <span class="stat-label">Kategori</span>
-              <strong id="statCategories">0</strong>
-              <p>Pilihan menu tersusun rapi</p>
-            </article>
-
-            <article class="stat-card">
-              <span class="stat-label">Harga mulai</span>
-              <strong id="statPrice">Rp 0</strong>
-              <p>Ramah buat uang saku sekolah</p>
-            </article>
-
-            <article class="stat-card">
-              <span class="stat-label">Total stok</span>
-              <strong id="statStock">0</strong>
-              <p>Terpantau langsung dari katalog</p>
-            </article>
+        <section class="catalog-layout">
+          <div class="section-heading">
+            <h2>Temukan menu favoritmu</h2>
           </div>
 
-          <section class="hero-spotlight" aria-labelledby="featuredTitle">
-            <div class="section-inline-head">
-              <p class="eyebrow">Pilihan cepat</p>
-              <h2 id="featuredTitle">Produk yang sering dicari</h2>
-            </div>
-            <div id="featuredTags" class="featured-tags"></div>
+          <section class="search-panel">
+            <input id="searchInput" type="search" placeholder="Cari produk...">
           </section>
+
+
+          <div id="filterChips" class="filter-chips"></div>
+          <p id="resultsMeta">Memuat produk...</p>
+
+          <section id="productGrid" class="product-grid"></section>
+          <section id="emptyState" class="empty-state hidden">
+            <p>Tidak ditemukan</p>
+            <button id="emptyResetButton" class="primary-button">Tampilkan semua</button>
+          </section>
+        </section>
+
+        <section class="trust-grid">
+          <article class="feature-card">
+            <h3>Titik jual jelas</h3>
+            <p id="addressText">Alamat akan tampil di sini.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Layanan cepat</h3>
+            <p>Checkout via WhatsApp.</p>
+          </article>
+        </section>
+      </section>
+
+
+      <!-- Cart Page -->
+      <section id="cart" class="page">
+        <div class="cart-page">
+          <header>
+            <h1>Keranjang</h1>
+          </header>
+          <div id="cartItems" class="cart-items"></div>
+          <div id="cartEmpty" class="cart-empty">
+            <h3>Keranjang kosong</h3>
+            <p>Pilih produk dari beranda.</p>
+          </div>
+          <div class="cart-summary">
+            <div class="cart-summary-row">
+              <span>Total</span>
+              <strong id="summaryTotal">Rp 0</strong>
+            </div>
+            <button id="checkoutButton" class="primary-button" disabled>Checkout via WhatsApp</button>
+          </div>
         </div>
       </section>
 
-      <section class="trust-grid reveal">
-        <article class="feature-card">
-          <span class="feature-index">01</span>
-          <h2>Titik jual jelas</h2>
-          <p id="addressText">Alamat dan sekolah akan tampil di sini setelah data partner dimuat.</p>
-        </article>
 
-        <article class="feature-card">
-          <span class="feature-index">02</span>
-          <h2>Layanan cepat</h2>
-          <p id="serviceText">Kontak penjual dan alur checkout akan terhubung langsung ke WhatsApp.</p>
-        </article>
-
-        <article class="feature-card">
-          <span class="feature-index">03</span>
-          <h2>Katalog terkurasi</h2>
-          <p id="catalogText">Statistik menu dan stok akan dirangkum secara otomatis dari data produk.</p>
-        </article>
-      </section>
-
-      <section class="catalog-layout">
-        <div class="catalog-main">
-          <div class="section-heading reveal">
-            <div>
-              <p class="eyebrow">Katalog pilihan</p>
-              <h2>Temukan menu favoritmu</h2>
-            </div>
-            <p class="section-copy">Cari lebih cepat, filter lebih nyaman, dan lihat stok tanpa harus menebak.</p>
+      <!-- Transactions Page -->
+      <section id="transactions" class="page">
+        <h1>Transaksi</h1>
+        <div class="transactions-list">
+          <div class="transaction-card">
+            <h3>Riwayat pesanan kosong</h3>
+            <p>Transaksi akan tercatat di sini.</p>
           </div>
-
-          <section class="search-panel reveal" aria-labelledby="catalogToolsTitle">
-            <div class="search-main">
-              <p id="catalogToolsTitle" class="eyebrow">Pencarian dan filter</p>
-              <label class="search-field" for="searchInput">
-                <span class="field-label">Cari produk</span>
-                <input id="searchInput" type="search" placeholder="Contoh: Milo, Le Mineral, Pizza" autocomplete="off">
-              </label>
-            </div>
-
-            <div class="search-actions">
-              <label class="sort-field" for="sortSelect">
-                <span class="field-label">Urutkan</span>
-                <select id="sortSelect">
-                  <option value="recommended">Rekomendasi</option>
-                  <option value="lowest">Harga termurah</option>
-                  <option value="highest">Harga tertinggi</option>
-                  <option value="stock">Stok terbanyak</option>
-                </select>
-              </label>
-
-              <button id="clearSearchButton" class="ghost-button secondary-action" type="button">Reset</button>
-            </div>
-          </section>
-
-          <div id="filterChips" class="filter-chips reveal" aria-label="Filter kategori"></div>
-
-          <div class="results-meta reveal">
-            <p id="resultsMeta">Memuat produk...</p>
-            <p id="cartMeta">Keranjang masih kosong</p>
-          </div>
-
-          <section id="productGrid" class="product-grid" aria-live="polite" aria-busy="true"></section>
-
-          <section id="emptyState" class="empty-state hidden" aria-live="polite">
-            <p class="empty-title">Produk tidak ditemukan</p>
-            <p class="empty-copy">Coba ubah kata kunci pencarian atau kembali ke kategori semua.</p>
-            <button id="emptyResetButton" class="primary-button" type="button">Tampilkan semua produk</button>
-          </section>
         </div>
-
-        <aside class="cart-column">
-          <button id="cartOverlay" class="cart-overlay" type="button" hidden aria-label="Tutup keranjang"></button>
-
-          <section id="cartPanel" class="cart-panel" aria-labelledby="cartTitle">
-            <header class="cart-header">
-              <div>
-                <p class="eyebrow">Ringkasan pesanan</p>
-                <h2 id="cartTitle">Keranjangmu</h2>
-              </div>
-
-              <button id="closeCartButton" class="icon-button" type="button" aria-label="Tutup keranjang">Tutup</button>
-            </header>
-
-            <div id="cartItems" class="cart-items"></div>
-
-            <div id="cartEmpty" class="cart-empty">
-              <h3>Belum ada produk di keranjang</h3>
-              <p>Pilih makanan atau minuman favorit. Jumlah item dan total belanja akan muncul otomatis di sini.</p>
-            </div>
-
-            <section id="recommendationCard" class="recommendation-card hidden" aria-labelledby="recommendationName">
-              <p class="eyebrow">Tambahan cerdas</p>
-              <div class="recommendation-body">
-                <div>
-                  <h3 id="recommendationName">-</h3>
-                  <p id="recommendationMeta">-</p>
-                </div>
-                <button id="recommendationButton" class="ghost-button" type="button">Tambah</button>
-              </div>
-            </section>
-
-            <div class="cart-summary">
-              <div class="summary-row">
-                <span>Total item</span>
-                <strong id="summaryCount">0</strong>
-              </div>
-              <div class="summary-row total">
-                <span>Total bayar</span>
-                <strong id="summaryTotal">Rp 0</strong>
-              </div>
-            </div>
-
-            <button id="checkoutButton" class="primary-button checkout-button" type="button" disabled>Checkout via WhatsApp</button>
-            <p class="helper-copy">Ringkasan pesanan akan dibuka di WhatsApp penjual sesuai nomor pada data partner.</p>
-          </section>
-        </aside>
       </section>
-    </main>
-  </div>
 
-  <div id="mobileCartBar" class="mobile-cart-bar">
-    <div>
-      <span class="mobile-cart-label">Keranjang aktif</span>
-      <strong id="mobileCartTotal">Rp 0</strong>
+      <!-- Profile Page -->
+      <section id="profile" class="page">
+        <h1>Profil</h1>
+        <div class="profile-grid">
+          <div class="profile-card">
+            <h3>Informasi Pengguna</h3>
+            <div class="profile-input-field">
+              <label>Nama: <input type="text" placeholder="Masukkan nama" class="profile-input"></label>
+              <label>Sekolah: <input type="text" placeholder="Nama sekolah" class="profile-input"></label>
+              <label>Nomor WA: <input type="tel" placeholder="08xx" class="profile-input"></label>
+            </div>
+          </div>
+          <div class="profile-card">
+            <h3>Tema</h3>
+            <div class="theme-toggle">
+              <span>Light</span>
+              <input type="checkbox" id="themeToggle">
+              <span>Dark</span>
+            </div>
+          </div>
+          <div class="profile-card">
+            <h3>Settings</h3>
+            <ul class="settings-list">
+              <li><label><input type="checkbox"> Notifikasi promo</label></li>
+              <li><label><input type="checkbox"> Auto-checkout</label></li>
+            </ul>
+          </div>
+        </div>
+      </section>
     </div>
-    <button id="mobileCartButton" class="primary-button" type="button">
-      Lihat pesanan
-      <span id="mobileCartCount">0</span>
-    </button>
+
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="#home" class="nav-item active" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Beranda</span>
+      </a>
+      <a href="#cart" class="nav-item" data-page="cart">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">Keranjang</span>
+        <span id="navCartCount" class="nav-cart-badge">0</span>
+      </a>
+      <a href="#transactions" class="nav-item" data-page="transactions">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Transaksi</span>
+      </a>
+      <a href="#profile" class="nav-item" data-page="profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profil</span>
+      </a>
+    </nav>
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- Overlays/Modals preserved -->
+  <button id="cartOverlay" class="cart-overlay" hidden></button>
+  <div id="toast" class="toast"></div>
+
 </body>
 </html>
+
