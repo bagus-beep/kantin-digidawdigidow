@@ -1,788 +1,454 @@
-const DOM = {
-  partnerName: document.getElementById("partnerName"),
-  partnerTagline: document.getElementById("partnerTagline"),
-  schoolBadge: document.getElementById("schoolBadge"),
-  ownerBadge: document.getElementById("ownerBadge"),
-  deliveryBadge: document.getElementById("deliveryBadge"),
-  statProducts: document.getElementById("statProducts"),
-  statCategories: document.getElementById("statCategories"),
-  statPrice: document.getElementById("statPrice"),
-  statStock: document.getElementById("statStock"),
-  featuredTags: document.getElementById("featuredTags"),
-  addressText: document.getElementById("addressText"),
-  serviceText: document.getElementById("serviceText"),
-  catalogText: document.getElementById("catalogText"),
-  searchInput: document.getElementById("searchInput"),
-  sortSelect: document.getElementById("sortSelect"),
-  clearSearchButton: document.getElementById("clearSearchButton"),
-  emptyResetButton: document.getElementById("emptyResetButton"),
-  filterChips: document.getElementById("filterChips"),
-  resultsMeta: document.getElementById("resultsMeta"),
-  cartMeta: document.getElementById("cartMeta"),
-  productGrid: document.getElementById("productGrid"),
-  emptyState: document.getElementById("emptyState"),
-  cartPanel: document.getElementById("cartPanel"),
-  cartOverlay: document.getElementById("cartOverlay"),
-  cartItems: document.getElementById("cartItems"),
-  cartEmpty: document.getElementById("cartEmpty"),
-  recommendationCard: document.getElementById("recommendationCard"),
-  recommendationName: document.getElementById("recommendationName"),
-  recommendationMeta: document.getElementById("recommendationMeta"),
-  recommendationButton: document.getElementById("recommendationButton"),
-  summaryCount: document.getElementById("summaryCount"),
-  summaryTotal: document.getElementById("summaryTotal"),
-  checkoutButton: document.getElementById("checkoutButton"),
-  topCartCount: document.getElementById("topCartCount"),
-  mobileCartBar: document.getElementById("mobileCartBar"),
-  mobileCartCount: document.getElementById("mobileCartCount"),
-  mobileCartTotal: document.getElementById("mobileCartTotal"),
-  scrollCatalogButton: document.getElementById("scrollCatalogButton"),
-  primaryCtaButton: document.getElementById("primaryCtaButton"),
-  contactSellerButton: document.getElementById("contactSellerButton"),
-  cartToggleButton: document.getElementById("cartToggleButton"),
-  closeCartButton: document.getElementById("closeCartButton"),
-  mobileCartButton: document.getElementById("mobileCartButton"),
-  toast: document.getElementById("toast")
+/**
+ * Kantin Digital - Complete Modular Refactor
+ * Clean, DRY, Mobile-First, Theme-aware E-commerce App
+ */
+
+'use strict';
+
+// ==========================================================================
+// UTILS - Reusable helpers
+// ==========================================================================
+
+const Utils = {
+  STORAGE_KEY: 'kantin_digital_cart_v3',
+  MAX_TOAST_TIME: 2600,
+  currency: new Intl.NumberFormat('id-ID'),
+  toastTimer: null,
+
+  parseNumber(str) {
+    return Number(String(str || '0').replace(/[^\\d]/g, '')) || 0;
+  },
+
+  formatCurrency(value) {
+    return `Rp ${this.currency.format(Math.max(Number(value) || 0, 0))}`;
+  },
+
+  normalizeSpaces(str) {
+    return String(str || '').replace(/\\s+/g, ' ').trim();
+  },
+
+  toTitleCase(str) {
+    return this.normalizeSpaces(str).toLowerCase().replace(/\\b\\w/g, m => m.toUpperCase());
+  },
+
+  escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  },
+
+  loadCart() {
+    try {
+      return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  },
+
+  saveCart(cart) {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cart));
+  },
+
+  showToast(message) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => toast.classList.remove('is-visible'), this.MAX_TOAST_TIME);
+  },
+
+  updateNavCartBadge() {
+    const badge = document.getElementById('navCartCount');
+    if (!badge) return;
+    
+    const count = STATE.cart.reduce((sum, item) => sum + item.qty, 0);
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'block' : 'none';
+  }
 };
 
-const STORAGE_KEY = "kantin_digital_cart_v3";
-const MAX_TOAST_TIME = 2600;
-const currency = new Intl.NumberFormat("id-ID");
-let toastTimer = null;
+// ==========================================================================
+// STATE - Centralized app state
+// ==========================================================================
 
-const state = {
+const STATE = {
   partner: null,
   products: [],
-  category: "ALL",
-  search: "",
-  sort: "recommended",
-  cart: loadCart(),
-  cartOpen: false
+  category: 'ALL',
+  search: '',
+  cart: Utils.loadCart(),
+
+  syncCartWithProducts() {
+    this.cart = this.cart.filter(item => {
+      const product = this.findProduct(item.id);
+      if (!product || product.stock <= 0) return false;
+      item.qty = Math.min(item.qty, product.stock);
+      return item.qty > 0;
+    });
+    Utils.saveCart(this.cart);
+  },
+
+  findProduct(id) {
+    return this.products.find(p => p.id === id);
+  },
+
+  getCartQuantity(id) {
+    const item = this.cart.find(item => item.id === id);
+    return item ? item.qty : 0;
+  }
 };
 
-document.addEventListener("DOMContentLoaded", init);
+// ==========================================================================
+// DOM - Query selectors (only existing HTML elements)
+// ==========================================================================
 
-async function init() {
-  bindEvents();
-  renderLoadingProducts();
-
-  try {
-    const [partners, rawProducts] = await Promise.all([
-      fetchJson("data/partners.json"),
-      fetchJson("data/products.json")
-    ]);
-
-    hydrateData(partners, rawProducts);
-    syncCartWithProducts();
-    renderPartnerInfo();
-    renderFilters();
-    renderProducts();
-    renderCart();
-  } catch (error) {
-    console.error("Initialization error:", error);
-    showToast("Data katalog gagal dimuat.");
-    renderFailureState();
+const Dom = {
+  get elements() {
+    return {
+      partnerName: document.getElementById('partnerName'),
+      partnerTagline: document.getElementById('partnerTagline'),
+      addressText: document.getElementById('addressText'),
+      searchInput: document.getElementById('searchInput'),
+      filterChips: document.getElementById('filterChips'),
+      resultsMeta: document.getElementById('resultsMeta'),
+      productGrid: document.getElementById('productGrid'),
+      emptyState: document.getElementById('emptyState'),
+      cartItems: document.getElementById('cartItems'),
+      cartEmpty: document.getElementById('cartEmpty'),
+      summaryTotal: document.getElementById('summaryTotal'),
+      checkoutButton: document.getElementById('checkoutButton'),
+      primaryCtaButton: document.getElementById('primaryCtaButton'),
+      contactSellerButton: document.getElementById('contactSellerButton'),
+      emptyResetButton: document.getElementById('emptyResetButton'),
+      navCartCount: document.getElementById('navCartCount'),
+      toast: document.getElementById('toast'),
+      themeToggle: document.getElementById('themeToggle'),
+      cartOverlay: document.getElementById('cartOverlay')
+    };
   }
+};
 
-  registerServiceWorker();
-}
+// ==========================================================================
+// RENDERERS - Pure UI update functions
+// ==========================================================================
 
-function bindEvents() {
-  DOM.searchInput.addEventListener("input", (event) => {
-    state.search = event.target.value.trim().toLowerCase();
-    renderProducts();
-  });
+const Render = {
+  loadingProducts() {
+    Dom.elements.productGrid.innerHTML = Array(6).fill().map((_, i) => `
+      <article class="product-card" style="--delay: ${i * 55}ms;">
+        <div class="product-media"></div>
+        <div class="product-body">
+          <div class="product-title-row">
+            <div style="height: 18px; width: 60%; background: var(--bg-secondary); border-radius: 4px;"></div>
+            <div style="height: 18px; width: 24%; background: var(--bg-secondary); border-radius: 4px;"></div>
+          </div>
+          <div style="height: 14px; width: 75%; background: var(--bg-secondary); border-radius: 4px;"></div>
+          <div style="height: 48px; background: var(--bg-secondary); border-radius: 8px;"></div>
+        </div>
+      </article>
+    `).join('');
+  },
 
-  DOM.sortSelect.addEventListener("change", (event) => {
-    state.sort = event.target.value;
-    renderProducts();
-  });
+  async products() {
+    const visible = STATE.products
+      .filter(p => STATE.category === 'ALL' || p.category === STATE.category)
+      .filter(p => !STATE.search || p.name.toLowerCase().includes(STATE.search));
 
-  DOM.clearSearchButton.addEventListener("click", resetCatalog);
-  DOM.emptyResetButton.addEventListener("click", resetCatalog);
-  DOM.filterChips.addEventListener("click", handleFilterClick);
-  DOM.productGrid.addEventListener("click", handleProductGridClick);
-  DOM.productGrid.addEventListener("error", handleGridImageError, true);
-  DOM.cartItems.addEventListener("click", handleCartClick);
-  DOM.recommendationButton.addEventListener("click", addRecommendedProduct);
-  DOM.checkoutButton.addEventListener("click", checkoutViaWhatsApp);
-  DOM.contactSellerButton.addEventListener("click", contactSeller);
-  DOM.scrollCatalogButton.addEventListener("click", scrollToCatalog);
-  DOM.primaryCtaButton.addEventListener("click", scrollToCatalog);
-  DOM.cartToggleButton.addEventListener("click", () => toggleCart(true));
-  DOM.closeCartButton.addEventListener("click", () => toggleCart(false));
-  DOM.cartOverlay.addEventListener("click", () => toggleCart(false));
-  DOM.mobileCartButton.addEventListener("click", () => toggleCart(true));
+    Dom.elements.resultsMeta.textContent = visible.length 
+      ? `${visible.length} produk tersedia`
+      : 'Tidak ada produk ditemukan';
+    
+    Dom.elements.emptyState.classList.toggle('hidden', visible.length > 0);
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      toggleCart(false);
+    if (!visible.length) {
+      Dom.elements.productGrid.innerHTML = '';
+      return;
     }
-  });
 
-  window.addEventListener("resize", () => {
-    if (!isMobileViewport()) {
-      toggleCart(false, { skipScroll: true });
-    }
-  });
-}
-
-async function fetchJson(url) {
-  const response = await fetch(url, { cache: "no-store" });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.status}`);
-  }
-
-  return response.json();
-}
-
-function hydrateData(partners, rawProducts) {
-  const partnerList = Array.isArray(partners) ? partners : [];
-  const normalizedProducts = Array.isArray(rawProducts)
-    ? rawProducts.map(normalizeProduct).filter(Boolean)
-    : [];
-
-  const primaryPartner = normalizePartner(partnerList[0] || {});
-  state.partner = primaryPartner;
-
-  const matchingProducts = primaryPartner.id
-    ? normalizedProducts.filter((product) => product.partnerId === primaryPartner.id)
-    : normalizedProducts;
-
-  state.products = matchingProducts.length ? matchingProducts : normalizedProducts;
-}
-
-function normalizePartner(rawPartner) {
-  return {
-    id: typeof rawPartner.mitra_id === "string" ? rawPartner.mitra_id : "",
-    name: toTitleCase(rawPartner.mitra_name || "Kantin Digital"),
-    owner: toTitleCase(rawPartner.owner_name || "Pengelola Kantin"),
-    school: toTitleCase(rawPartner.sekolah || "Sekolah"),
-    address: normalizeSpaces(rawPartner.address_owner || "Alamat mitra belum tersedia."),
-    phoneDisplay: normalizeDisplayPhone(rawPartner.phone_owner || ""),
-    phoneLink: normalizePhoneLink(rawPartner.phone_owner || "")
-  };
-}
-
-function normalizeProduct(rawProduct) {
-  if (!rawProduct || typeof rawProduct !== "object") {
-    return null;
-  }
-
-  const price = parseNumber(rawProduct.produk_price);
-  const stock = parseNumber(rawProduct.produk_stock);
-  const name = normalizeSpaces(rawProduct.produk_name || "Produk");
-  const category = normalizeCategory(rawProduct.produk_kategori || "LAINNYA");
-
-  if (!name) {
-    return null;
-  }
-
-  return {
-    id: String(rawProduct.produk_id || `${name}-${price}`),
-    partnerId: String(rawProduct.mitra_id || ""),
-    name: toTitleCase(name),
-    category,
-    categoryLabel: labelizeCategory(category),
-    price,
-    stock,
-    image: normalizeSpaces(rawProduct.produk_image || ""),
-    school: toTitleCase(rawProduct.sekolah || "")
-  };
-}
-
-function renderPartnerInfo() {
-  const partner = state.partner;
-  const products = state.products;
-  const totalStock = products.reduce((sum, product) => sum + Math.max(product.stock, 0), 0);
-  const minimumPrice = products.length ? Math.min(...products.map((product) => product.price)) : 0;
-  const categories = getCategories();
-  const featuredProducts = getFeaturedProducts(products);
-  const previewNames = featuredProducts.map((product) => product.name).slice(0, 3);
-
-  document.title = `${partner.name} | Marketplace Kantin Digital`;
-
-  DOM.partnerName.textContent = partner.name;
-  DOM.partnerTagline.textContent = `${products.length} menu untuk ${partner.school}. Dikelola oleh ${partner.owner} dengan alur belanja cepat via WhatsApp.`;
-  DOM.schoolBadge.textContent = partner.school;
-  DOM.ownerBadge.textContent = `Dikelola ${partner.owner}`;
-  DOM.deliveryBadge.textContent = partner.phoneDisplay ? `WhatsApp ${partner.phoneDisplay}` : "Checkout via WhatsApp";
-
-  DOM.statProducts.textContent = String(products.length);
-  DOM.statCategories.textContent = String(categories.length);
-  DOM.statPrice.textContent = formatCurrency(minimumPrice);
-  DOM.statStock.textContent = currency.format(totalStock);
-
-  DOM.addressText.textContent = `${partner.school} - ${partner.address}`;
-  DOM.serviceText.textContent = partner.phoneDisplay
-    ? `Hubungi ${partner.owner} di ${partner.phoneDisplay} untuk konfirmasi stok atau pickup.`
-    : `Hubungi ${partner.owner} untuk konfirmasi stok dan info pemesanan.`;
-  DOM.catalogText.textContent = `${products.length} produk aktif, ${categories.length} kategori, dan pilihan cepat seperti ${previewNames.join(", ") || "menu favorit sekolah"}.`;
-
-  DOM.featuredTags.innerHTML = featuredProducts
-    .map((product) => `<span class="featured-tag">${escapeHtml(product.name)}</span>`)
-    .join("");
-}
-
-function renderFilters() {
-  const filters = ["ALL", ...getCategories()];
-
-  DOM.filterChips.innerHTML = filters
-    .map((category) => {
-      const className = category === state.category ? "filter-chip is-active" : "filter-chip";
-      const label = category === "ALL" ? "Semua" : labelizeCategory(category);
-      return `<button class="${className}" type="button" data-category="${escapeAttribute(category)}">${escapeHtml(label)}</button>`;
-    })
-    .join("");
-}
-
-function renderProducts() {
-  const products = getVisibleProducts();
-
-  DOM.productGrid.setAttribute("aria-busy", "false");
-  DOM.resultsMeta.textContent = products.length
-    ? `${products.length} produk ditemukan untuk ${state.partner.school}`
-    : "Tidak ada produk untuk filter yang dipilih";
-  DOM.emptyState.classList.toggle("hidden", products.length > 0);
-
-  if (!products.length) {
-    DOM.productGrid.innerHTML = "";
-    return;
-  }
-
-  DOM.productGrid.innerHTML = products
-    .map((product, index) => {
-      const cartQty = getCartQuantity(product.id);
-      const stockClass = product.stock === 0 ? "stock-pill is-out" : product.stock <= 5 ? "stock-pill is-low" : "stock-pill";
-      const stockLabel = product.stock === 0 ? "Stok habis" : `Stok ${product.stock}`;
-      const buttonLabel = product.stock === 0 ? "Habis" : cartQty ? "Tambah lagi" : "Masukkan ke keranjang";
-      const buttonClass = product.stock === 0 ? "add-button" : "add-button is-primary";
-      const description = product.school ? `Siap dipesan untuk ${product.school}` : "Siap dipesan hari ini";
+    Dom.elements.productGrid.innerHTML = visible.map((product, i) => {
+      const cartQty = STATE.getCartQuantity(product.id);
+      const lowStock = product.stock <= 5 && product.stock > 0;
+      const outOfStock = product.stock === 0;
 
       return `
-        <article class="product-card" style="--delay: ${Math.min(index * 55, 330)}ms;">
+        <article class="product-card" style="--delay: ${Math.min(i * 55, 330)}ms;">
           <div class="product-media">
-            ${product.image ? `<img src="${escapeAttribute(product.image)}" alt="${escapeAttribute(product.name)}" loading="lazy" data-product-image="true">` : buildImageFallback(product.name)}
-            <span class="product-chip">${escapeHtml(product.categoryLabel)}</span>
-            <span class="${stockClass}">${escapeHtml(stockLabel)}</span>
+            ${product.image ? `<img src="${product.image}" alt="${product.name}" loading="lazy">` : `<div class="product-fallback">${Utils.getInitials(product.name)}</div>`}
+            <span class="product-chip">${product.categoryLabel}</span>
+            <span class="${lowStock ? 'stock-low' : outOfStock ? 'stock-out' : 'stock-ok'}">${outOfStock ? 'Habis' : `Stok ${product.stock}`}</span>
           </div>
-
           <div class="product-body">
             <div class="product-title-row">
-              <h3 class="product-title">${escapeHtml(product.name)}</h3>
-              <span class="product-price">${formatCurrency(product.price)}</span>
+              <h3>${Utils.escapeHtml(product.name)}</h3>
+              <span class="price">${Utils.formatCurrency(product.price)}</span>
             </div>
-
-            <p class="product-description">${escapeHtml(description)}</p>
-
+            <p>${product.school || 'Siap diambil hari ini'}</p>
             <div class="product-meta">
-              <span>${escapeHtml(product.categoryLabel)}</span>
-              ${cartQty ? `<span class="in-cart-pill">${cartQty} di keranjang</span>` : `<span>${escapeHtml(stockLabel)}</span>`}
+              <span>${product.categoryLabel}</span>
+              ${cartQty ? `<span>${cartQty} di keranjang</span>` : ''}
             </div>
-
-            <button class="${buttonClass}" type="button" data-product-id="${escapeAttribute(product.id)}" ${product.stock === 0 ? "disabled" : ""}>
-              ${escapeHtml(buttonLabel)}
+            <button class="add-to-cart ${outOfStock ? 'disabled' : ''}" data-product-id="${product.id}" ${outOfStock ? 'disabled' : ''}>
+              ${outOfStock ? 'Habis' : cartQty ? 'Tambah lagi' : 'Keranjang'}
             </button>
           </div>
         </article>
       `;
-    })
-    .join("");
-}
-
-function renderCart() {
-  const items = getCartDetails();
-  const totalQuantity = items.reduce((sum, item) => sum + item.qty, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.lineTotal, 0);
-
-  DOM.cartEmpty.classList.toggle("hidden", items.length > 0);
-  DOM.cartItems.innerHTML = items
-    .map((item) => {
-      return `
-        <article class="cart-item">
-          <div class="cart-item-head">
-            <div>
-              <h3 class="cart-item-title">${escapeHtml(item.product.name)}</h3>
-              <p class="cart-item-meta">${escapeHtml(item.product.categoryLabel)} - ${escapeHtml(item.stockLabel)}</p>
-            </div>
-            <span class="cart-item-price">${formatCurrency(item.product.price)}</span>
-          </div>
-
-          <div class="cart-item-footer">
-            <div class="quantity-controls">
-              <button class="quantity-button" type="button" data-cart-product-id="${escapeAttribute(item.product.id)}" data-delta="-1">-</button>
-              <span class="quantity-value">${item.qty}</span>
-              <button class="quantity-button" type="button" data-cart-product-id="${escapeAttribute(item.product.id)}" data-delta="1">+</button>
-            </div>
-            <span class="line-total">${formatCurrency(item.lineTotal)}</span>
-          </div>
-        </article>
-      `;
-    })
-    .join("");
-
-  DOM.summaryCount.textContent = `${totalQuantity} item`;
-  DOM.summaryTotal.textContent = formatCurrency(totalPrice);
-  DOM.topCartCount.textContent = String(totalQuantity);
-  DOM.mobileCartBar.classList.toggle("is-visible", totalQuantity > 0);
-  DOM.mobileCartCount.textContent = String(totalQuantity);
-  DOM.mobileCartTotal.textContent = formatCurrency(totalPrice);
-  DOM.cartMeta.textContent = totalQuantity ? `${totalQuantity} item sedang disiapkan di keranjang` : "Keranjang masih kosong";
-  DOM.checkoutButton.disabled = totalQuantity === 0;
-
-  renderRecommendation(items);
-  saveCart();
-}
-
-function renderRecommendation(items) {
-  const recommendation = getRecommendation(items);
-
-  if (!recommendation) {
-    DOM.recommendationCard.classList.add("hidden");
-    DOM.recommendationButton.dataset.productId = "";
-    return;
-  }
-
-  DOM.recommendationCard.classList.remove("hidden");
-  DOM.recommendationName.textContent = recommendation.name;
-  DOM.recommendationMeta.textContent = `${recommendation.categoryLabel} - ${formatCurrency(recommendation.price)}`;
-  DOM.recommendationButton.dataset.productId = recommendation.id;
-}
-
-function getRecommendation(items = getCartDetails()) {
-  if (!state.products.length) {
-    return null;
-  }
-
-  const cartCategories = new Set(items.map((item) => item.product.category));
-  const candidatePool = state.products.filter((product) => product.stock > 0 && !getCartQuantity(product.id));
-
-  if (!candidatePool.length) {
-    return null;
-  }
-
-  return candidatePool.find((product) => !cartCategories.has(product.category)) || candidatePool[0];
-}
-
-function handleFilterClick(event) {
-  const button = event.target.closest("[data-category]");
-
-  if (!button) {
-    return;
-  }
-
-  state.category = button.dataset.category || "ALL";
-  renderFilters();
-  renderProducts();
-}
-
-function handleProductGridClick(event) {
-  const button = event.target.closest("[data-product-id]");
-
-  if (!button) {
-    return;
-  }
-
-  addToCart(button.dataset.productId || "");
-}
-
-function handleCartClick(event) {
-  const button = event.target.closest("[data-cart-product-id]");
-
-  if (!button) {
-    return;
-  }
-
-  updateCartItem(button.dataset.cartProductId || "", Number(button.dataset.delta || 0));
-}
-
-function handleGridImageError(event) {
-  const image = event.target;
-
-  if (!(image instanceof HTMLImageElement) || !image.dataset.productImage) {
-    return;
-  }
-
-  const fallback = document.createElement("div");
-  fallback.className = "product-fallback";
-  fallback.textContent = getInitials(image.alt || "KD");
-  image.replaceWith(fallback);
-}
-
-function addToCart(productId) {
-  const product = findProduct(productId);
-
-  if (!product) {
-    showToast("Produk tidak ditemukan.");
-    return;
-  }
-
-  if (product.stock === 0) {
-    showToast("Produk ini sedang habis.");
-    return;
-  }
-
-  const existing = state.cart.find((item) => item.id === productId);
-
-  if (existing) {
-    if (existing.qty >= product.stock) {
-      showToast("Jumlah sudah mencapai batas stok.");
-      return;
-    }
-
-    existing.qty += 1;
-  } else {
-    state.cart.push({ id: productId, qty: 1 });
-  }
-
-  renderProducts();
-  renderCart();
-  showToast(`${product.name} ditambahkan ke keranjang.`);
-}
-
-function updateCartItem(productId, delta) {
-  if (!delta) {
-    return;
-  }
-
-  const item = state.cart.find((cartItem) => cartItem.id === productId);
-  const product = findProduct(productId);
-
-  if (!item || !product) {
-    state.cart = state.cart.filter((cartItem) => cartItem.id !== productId);
-    renderProducts();
-    renderCart();
-    return;
-  }
-
-  const nextQty = item.qty + delta;
-
-  if (nextQty <= 0) {
-    state.cart = state.cart.filter((cartItem) => cartItem.id !== productId);
-    renderProducts();
-    renderCart();
-    return;
-  }
-
-  if (nextQty > product.stock) {
-    showToast("Stok tidak mencukupi.");
-    return;
-  }
-
-  item.qty = nextQty;
-  renderProducts();
-  renderCart();
-}
-
-function addRecommendedProduct() {
-  const productId = DOM.recommendationButton.dataset.productId || "";
-
-  if (productId) {
-    addToCart(productId);
-  }
-}
-
-function checkoutViaWhatsApp() {
-  const items = getCartDetails();
-
-  if (!items.length) {
-    showToast("Keranjang masih kosong.");
-    return;
-  }
-
-  if (!state.partner.phoneLink) {
-    showToast("Nomor WhatsApp penjual belum tersedia.");
-    return;
-  }
-
-  const total = items.reduce((sum, item) => sum + item.lineTotal, 0);
-  const lines = [
-    `Halo ${state.partner.owner}, saya ingin memesan dari ${state.partner.name}.`,
-    "",
-    `Sekolah: ${state.partner.school}`,
-    "Pesanan:",
-    ...items.map((item) => `- ${item.product.name} x${item.qty} = ${formatCurrency(item.lineTotal)}`),
-    "",
-    `Total: ${formatCurrency(total)}`,
-    "Mohon konfirmasi stok dan proses pickup. Terima kasih."
-  ];
-
-  const url = `https://wa.me/${state.partner.phoneLink}?text=${encodeURIComponent(lines.join("\n"))}`;
-  window.open(url, "_blank", "noopener");
-}
-
-function contactSeller() {
-  if (!state.partner.phoneLink) {
-    showToast("Kontak penjual belum tersedia.");
-    return;
-  }
-
-  const message = encodeURIComponent(`Halo ${state.partner.owner}, saya ingin bertanya soal stok di ${state.partner.name}.`);
-  window.open(`https://wa.me/${state.partner.phoneLink}?text=${message}`, "_blank", "noopener");
-}
-
-function scrollToCatalog() {
-  DOM.searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
-  DOM.searchInput.focus({ preventScroll: true });
-}
-
-function toggleCart(force, options = {}) {
-  const openState = typeof force === "boolean" ? force : !state.cartOpen;
-
-  if (!isMobileViewport()) {
-    state.cartOpen = false;
-    document.body.classList.remove("cart-open");
-    DOM.cartPanel.classList.remove("is-open");
-    DOM.cartOverlay.hidden = true;
-    DOM.cartToggleButton.setAttribute("aria-expanded", "false");
-
-    if (openState && !options.skipScroll) {
-      DOM.cartPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    return;
-  }
-
-  state.cartOpen = openState;
-  document.body.classList.toggle("cart-open", openState);
-  DOM.cartPanel.classList.toggle("is-open", openState);
-  DOM.cartOverlay.hidden = !openState;
-  DOM.cartToggleButton.setAttribute("aria-expanded", String(openState));
-}
-
-function resetCatalog() {
-  state.search = "";
-  state.category = "ALL";
-  state.sort = "recommended";
-  DOM.searchInput.value = "";
-  DOM.sortSelect.value = "recommended";
-  renderFilters();
-  renderProducts();
-}
-
-function renderLoadingProducts() {
-  DOM.productGrid.innerHTML = Array.from({ length: 6 }, (_, index) => {
-    return `
-      <article class="product-card" style="--delay: ${Math.min(index * 50, 280)}ms;">
-        <div class="product-media"></div>
-        <div class="product-body">
-          <div class="product-title-row">
-            <div style="height: 18px; width: 60%; border-radius: 999px; background: rgba(43, 34, 27, 0.08);"></div>
-            <div style="height: 18px; width: 24%; border-radius: 999px; background: rgba(43, 34, 27, 0.08);"></div>
-          </div>
-          <div style="height: 14px; width: 75%; border-radius: 999px; background: rgba(43, 34, 27, 0.08);"></div>
-          <div style="height: 48px; border-radius: 16px; background: rgba(43, 34, 27, 0.08);"></div>
-        </div>
-      </article>
-    `;
-  }).join("");
-}
-
-function renderFailureState() {
-  DOM.resultsMeta.textContent = "Gagal memuat katalog";
-  DOM.productGrid.setAttribute("aria-busy", "false");
-  DOM.productGrid.innerHTML = "";
-  DOM.emptyState.classList.remove("hidden");
-}
-
-function syncCartWithProducts() {
-  state.cart = state.cart
-    .map((item) => {
-      const product = findProduct(item.id);
-
-      if (!product || product.stock <= 0) {
-        return null;
-      }
-
-      const qty = Math.min(Math.max(Number(item.qty) || 0, 0), product.stock);
-      return qty ? { id: product.id, qty } : null;
-    })
-    .filter(Boolean);
-}
-
-function getVisibleProducts() {
-  const filtered = state.products.filter((product) => {
-    const matchCategory = state.category === "ALL" || product.category === state.category;
-    const matchSearch = !state.search || product.name.toLowerCase().includes(state.search);
-    return matchCategory && matchSearch;
-  });
-
-  return filtered.sort((first, second) => compareProducts(first, second, state.sort));
-}
-
-function compareProducts(first, second, sortMode) {
-  if (sortMode === "lowest") {
-    return first.price - second.price || first.name.localeCompare(second.name, "id");
-  }
-
-  if (sortMode === "highest") {
-    return second.price - first.price || first.name.localeCompare(second.name, "id");
-  }
-
-  if (sortMode === "stock") {
-    return second.stock - first.stock || first.price - second.price;
-  }
-
-  const stockRank = Number(second.stock > 0) - Number(first.stock > 0);
-  const cartRank = getCartQuantity(second.id) - getCartQuantity(first.id);
-  return stockRank || cartRank || first.price - second.price || first.name.localeCompare(second.name, "id");
-}
-
-function getCartDetails() {
-  return state.cart
-    .map((item) => {
-      const product = findProduct(item.id);
-
-      if (!product) {
-        return null;
-      }
-
+    }).join('');
+  },
+
+  cart() {
+    const items = STATE.cart.map(item => {
+      const product = STATE.findProduct(item.id);
+      if (!product) return null;
       return {
         product,
         qty: item.qty,
-        lineTotal: product.price * item.qty,
-        stockLabel: product.stock === 0 ? "Stok habis" : `Sisa stok ${product.stock}`
+        total: product.price * item.qty
       };
-    })
-    .filter(Boolean);
-}
+    }).filter(Boolean);
 
-function getCategories() {
-  return [...new Set(state.products.map((product) => product.category))];
-}
+    const total = items.reduce((sum, item) => sum + item.total, 0);
 
-function getFeaturedProducts(products) {
-  return [...products]
-    .filter((product) => product.stock > 0)
-    .sort((first, second) => compareProducts(first, second, "recommended"))
-    .slice(0, 5);
-}
+    Dom.elements.cartEmpty.classList.toggle('hidden', items.length > 0);
+    Dom.elements.summaryTotal.textContent = Utils.formatCurrency(total);
+    Dom.elements.checkoutButton.disabled = total === 0;
+    Utils.updateNavCartBadge();
 
-function findProduct(productId) {
-  return state.products.find((product) => product.id === productId) || null;
-}
+    Dom.elements.cartItems.innerHTML = items.map(item => `
+      <article class="cart-item">
+        <div>
+          <h4>${Utils.escapeHtml(item.product.name)}</h4>
+          <p>${item.product.categoryLabel} • Stok ${item.product.stock}</p>
+        </div>
+        <div class="cart-row">
+          <div class="qty-control">
+            <button class="qty-btn" data-id="${item.product.id}" data-delta="-1">-</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" data-id="${item.product.id}" data-delta="1">+</button>
+          </div>
+          <span class="line-total">${Utils.formatCurrency(item.total)}</span>
+        </div>
+      </article>
+    `).join('') || '';
 
-function getCartQuantity(productId) {
-  const foundItem = state.cart.find((item) => item.id === productId);
-  return foundItem ? foundItem.qty : 0;
-}
+    if (items.length === 0) {
+      Dom.elements.cartItems.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Keranjang kosong</p>';
+    }
+  },
 
-function loadCart() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (error) {
-    console.warn("Unable to parse cart:", error);
-    return [];
+  partnerInfo() {
+    if (!STATE.partner) return;
+    
+    Dom.elements.partnerName.textContent = STATE.partner.name;
+    Dom.elements.partnerTagline.textContent = `${STATE.products.length} menu untuk ${STATE.partner.school}`;
+    Dom.elements.addressText.textContent = STATE.partner.address || 'Alamat kantin';
+  },
+
+  filters() {
+    const categories = [...new Set(STATE.products.map(p => p.category))];
+    Dom.elements.filterChips.innerHTML = ['ALL', ...categories].map(cat => {
+      const active = cat === STATE.category;
+      const label = cat === 'ALL' ? 'Semua' : Utils.labelizeCategory(cat);
+      return `<button class="filter-chip ${active ? 'active' : ''}" data-category="${cat}">${label}</button>`;
+    }).join('');
+  }
+};
+
+// ==========================================================================
+// HANDLERS - Event handlers
+// ==========================================================================
+
+const Handlers = {
+  async initData() {
+    Render.loadingProducts();
+    
+    try {
+      const [partners, products] = await Promise.all([
+        fetch('data/partners.json').then(r => r.json()),
+        fetch('data/products.json').then(r => r.json())
+      ]);
+
+      STATE.partner = partners[0] || { name: 'Kantin Digital', school: 'Sekolah' };
+      STATE.products = products.map(p => ({
+        id: String(p.produk_id),
+        name: Utils.toTitleCase(p.produk_name),
+        category: Utils.normalizeCategory(p.produk_kategori),
+        categoryLabel: Utils.labelizeCategory(p.produk_kategori),
+        price: Utils.parseNumber(p.produk_price),
+        stock: Utils.parseNumber(p.produk_stock),
+        image: p.produk_image || ''
+      })).filter(p => p.name && p.price > 0);
+
+      STATE.syncCartWithProducts();
+      Render.partnerInfo();
+      Render.filters();
+      Render.products();
+      Render.cart();
+    } catch (error) {
+      console.error('Data load failed:', error);
+      Utils.showToast('Gagal memuat katalog');
+      Dom.elements.productGrid.innerHTML = '<p>Tidak dapat memuat produk</p>';
+    }
+  },
+
+  onSearchInput(e) {
+    STATE.search = e.target.value.toLowerCase().trim();
+    Render.products();
+  },
+
+  onFilterClick(e) {
+    const btn = e.target.closest('[data-category]');
+    if (!btn) return;
+    
+    STATE.category = btn.dataset.category;
+    Render.filters();
+    Render.products();
+  },
+
+  onProductClick(e) {
+    const btn = e.target.closest('[data-product-id]');
+    if (!btn) return;
+    
+    this.addToCart(btn.dataset.productId);
+  },
+
+  onCartClick(e) {
+    const btn = e.target.closest('.qty-btn');
+    if (!btn) return;
+    
+    const id = btn.dataset.id;
+    const delta = Number(btn.dataset.delta);
+    
+    const item = STATE.cart.find(item => item.id === id);
+    if (!item) return;
+    
+    item.qty = Math.max(1, Math.min(item.qty + delta, STATE.findProduct(id)?.stock || 999));
+    if (item.qty === 0) STATE.cart = STATE.cart.filter(i => i.id !== id);
+    
+    Utils.saveCart(STATE.cart);
+    Render.products();
+    Render.cart();
+  },
+
+  addToCart(id) {
+    const product = STATE.findProduct(id);
+    if (!product || product.stock === 0) {
+      Utils.showToast('Produk tidak tersedia');
+      return;
+    }
+
+    const item = STATE.cart.find(item => item.id === id);
+    if (item) {
+      if (item.qty >= product.stock) {
+        Utils.showToast('Stok habis');
+        return;
+      }
+      item.qty++;
+    } else {
+      STATE.cart.push({ id, qty: 1 });
+    }
+
+    Utils.saveCart(STATE.cart);
+    Render.products();
+    Render.cart();
+    Utils.showToast(`${product.name} ditambahkan`);
+  },
+
+  checkout() {
+    if (STATE.cart.length === 0) {
+      Utils.showToast('Keranjang kosong');
+      return;
+    }
+
+    const total = STATE.cart.reduce((sum, item) => {
+      const product = STATE.findProduct(item.id);
+      return sum + (product ? product.price * item.qty : 0);
+    }, 0);
+
+    const message = STATE.cart.map(item => {
+      const product = STATE.findProduct(item.id);
+      return product ? `- ${product.name} x${item.qty}` : '';
+    }).filter(Boolean).join('\\n');
+
+    const url = `https://wa.me/62?text=Halo! Pesanan:%0A${message}%0A%0ATotal: ${Utils.formatCurrency(total)}`;
+    window.open(url, '_blank');
+  },
+
+  contactSeller() {
+    window.open('https://wa.me/62?text=Halo Kantin Digital!');
+  },
+
+  resetSearch() {
+    STATE.search = '';
+    STATE.category = 'ALL';
+    Dom.elements.searchInput.value = '';
+    Render.filters();
+    Render.products();
+  },
+
+  initTheme() {
+    const toggle = Dom.elements.themeToggle;
+    if (toggle) {
+      const saved = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+      toggle.checked = saved === 'dark';
+      toggle.addEventListener('change', e => {
+        const theme = e.target.checked ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+      });
+    }
+  },
+
+  initNavigation() {
+    document.querySelectorAll('.nav-item[data-page]').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const pageId = link.dataset.page;
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        
+        document.getElementById(pageId)?.classList.add('active');
+        link.classList.add('active');
+      });
+    });
+  }
+};
+
+// ==========================================================================
+// INIT - App bootstrap
+// ==========================================================================
+
+function init() {
+  // Event listeners
+  Dom.elements.searchInput?.addEventListener('input', e => Handlers.onSearchInput(e));
+  Dom.elements.filterChips?.addEventListener('click', e => Handlers.onFilterClick(e));
+  Dom.elements.productGrid?.addEventListener('click', e => Handlers.onProductClick(e));
+  Dom.elements.cartItems?.addEventListener('click', e => Handlers.onCartClick(e));
+  Dom.elements.emptyResetButton?.addEventListener('click', () => Handlers.resetSearch());
+  Dom.elements.primaryCtaButton?.addEventListener('click', () => document.getElementById('searchInput')?.focus());
+  Dom.elements.contactSellerButton?.addEventListener('click', () => Handlers.contactSeller());
+  Dom.elements.checkoutButton?.addEventListener('click', () => Handlers.checkout());
+  Dom.elements.cartOverlay?.addEventListener('click', e => e.currentTarget.hidden = true);
+
+  // Theme & Nav
+  Handlers.initTheme();
+  Handlers.initNavigation();
+
+  // Load data
+  Handlers.initData();
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(console.warn);
   }
 }
 
-function saveCart() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.cart));
-}
+// Bootstrap
+document.addEventListener('DOMContentLoaded', init);
 
-function registerServiceWorker() {
-  if (!("serviceWorker" in navigator) || !window.location.protocol.startsWith("http")) {
-    return;
-  }
-
-  navigator.serviceWorker.register("./sw.js").catch((error) => {
-    console.warn("Service worker registration failed:", error);
-  });
-}
-
-function showToast(message) {
-  DOM.toast.textContent = message;
-  DOM.toast.classList.add("is-visible");
-
-  window.clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => {
-    DOM.toast.classList.remove("is-visible");
-  }, MAX_TOAST_TIME);
-}
-
-function formatCurrency(value) {
-  return `Rp ${currency.format(Math.max(Number(value) || 0, 0))}`;
-}
-
-function parseNumber(value) {
-  return Number(String(value || "0").replace(/[^\d]/g, "")) || 0;
-}
-
-function normalizeCategory(value) {
-  return normalizeSpaces(value).toUpperCase() || "LAINNYA";
-}
-
-function labelizeCategory(value) {
-  return toTitleCase(normalizeCategory(value).toLowerCase());
-}
-
-function normalizeSpaces(value) {
-  return String(value || "").replace(/\s+/g, " ").trim();
-}
-
-function toTitleCase(value) {
-  return normalizeSpaces(value)
-    .toLowerCase()
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function normalizePhoneLink(value) {
-  const digits = String(value || "").replace(/[^\d]/g, "");
-
-  if (!digits) {
-    return "";
-  }
-
-  if (digits.startsWith("62")) {
-    return digits;
-  }
-
-  if (digits.startsWith("0")) {
-    return `62${digits.slice(1)}`;
-  }
-
-  return digits;
-}
-
-function normalizeDisplayPhone(value) {
-  const digits = normalizePhoneLink(value);
-
-  if (!digits) {
-    return "";
-  }
-
-  return digits.replace(/(\d{2})(\d{3,4})(\d{3,4})(\d{0,4})/, (_, first, second, third, fourth) => {
-    return [first, second, third, fourth].filter(Boolean).join(" ");
-  });
-}
-
-function buildImageFallback(name) {
-  return `<div class="product-fallback">${escapeHtml(getInitials(name))}</div>`;
-}
-
-function getInitials(value) {
-  return normalizeSpaces(value)
-    .split(" ")
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("") || "KD";
-}
-
-function isMobileViewport() {
-  return window.matchMedia("(max-width: 980px)").matches;
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function escapeAttribute(value) {
-  return escapeHtml(value);
-}
+// Export for module use
+window.KantinApp = { STATE, Render, Handlers };
