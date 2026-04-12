@@ -6,12 +6,13 @@
 'use strict';
 
 // ==========================================================================
-// UTILS - Reusable helpers
+// UTILS - Reusable helpers (COMPLETE w/ missing functions)
 // ==========================================================================
 
 const Utils = {
   STORAGE_KEY: 'kantin_digital_cart_v3',
   MAX_TOAST_TIME: 2600,
+  PROFILE_KEY: 'kantin_profile_v1',
   currency: new Intl.NumberFormat('id-ID'),
   toastTimer: null,
 
@@ -37,6 +38,27 @@ const Utils = {
     return div.innerHTML;
   },
 
+  /** Missing: Get initials from name */
+  getInitials(name) {
+    return this.normalizeSpaces(name)
+      .split(' ')
+      .slice(0, 2)
+      .map(w => w[0]?.toUpperCase())
+      .join('')
+      .slice(0, 2) || '??';
+  },
+
+  /** Missing: Normalize category key */
+  normalizeCategory(cat) {
+    return this.normalizeSpaces(cat || '').toUpperCase();
+  },
+
+  /** Missing: Humanize category label */
+  labelizeCategory(cat) {
+    const map = { 'MAKANAN': 'Makanan', 'MINUMAN': 'Minuman', 'ALL': 'Semua' };
+    return map[this.normalizeCategory(cat)] || this.toTitleCase(cat);
+  },
+
   loadCart() {
     try {
       return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
@@ -47,6 +69,18 @@ const Utils = {
 
   saveCart(cart) {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cart));
+  },
+
+  loadProfile() {
+    try {
+      return JSON.parse(localStorage.getItem(this.PROFILE_KEY) || '{}');
+    } catch {
+      return {};
+    }
+  },
+
+  saveProfile(profile) {
+    localStorage.setItem(this.PROFILE_KEY, JSON.stringify(profile));
   },
 
   showToast(message) {
@@ -69,6 +103,7 @@ const Utils = {
     badge.style.display = count > 0 ? 'block' : 'none';
   }
 };
+
 
 // ==========================================================================
 // STATE - Centralized app state
@@ -415,8 +450,34 @@ const Handlers = {
         link.classList.add('active');
       });
     });
+
+    // Cart overlay toggle on nav cart click
+    const cartNav = document.querySelector('.nav-item[data-page=\"cart\"]');
+    const cartOverlay = Dom.elements.cartOverlay;
+    if (cartNav && cartOverlay) {
+      cartNav.addEventListener('click', () => {
+        cartOverlay.hidden = false;
+      });
+    }
+  },
+
+  /** Basic profile save */
+  initProfile() {
+    const inputs = document.querySelectorAll('.profile-input');
+    const profile = Utils.loadProfile();
+    
+    inputs.forEach(input => {
+      const key = input.closest('label')?.textContent.split(':')[0].trim().toLowerCase();
+      if (profile[key]) input.value = profile[key];
+      
+      input.addEventListener('change', () => {
+        profile[key] = input.value;
+        Utils.saveProfile(profile);
+      });
+    });
   }
 };
+
 
 // ==========================================================================
 // INIT - App bootstrap
@@ -434,9 +495,10 @@ function init() {
   Dom.elements.checkoutButton?.addEventListener('click', () => Handlers.checkout());
   Dom.elements.cartOverlay?.addEventListener('click', e => e.currentTarget.hidden = true);
 
-  // Theme & Nav
+  // Theme & Nav & Profile
   Handlers.initTheme();
   Handlers.initNavigation();
+  Handlers.initProfile();
 
   // Load data
   Handlers.initData();
@@ -446,6 +508,7 @@ function init() {
     navigator.serviceWorker.register('./sw.js').catch(console.warn);
   }
 }
+
 
 // Bootstrap
 document.addEventListener('DOMContentLoaded', init);
