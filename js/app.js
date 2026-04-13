@@ -9,10 +9,18 @@
 // UTILS - Reusable helpers (COMPLETE w/ missing functions)
 // ==========================================================================
 
+const CONSTANTS = {
+  STOCK_LOW_THRESHOLD: 5,
+  MAX_TOAST_TIME: 2600,
+  SEARCH_DEBOUNCE_MS: 300
+};
+
 const Utils = {
   STORAGE_KEY: 'kantin_digital_cart_v3',
-  MAX_TOAST_TIME: 2600,
   PROFILE_KEY: 'kantin_profile_v1',
+  CART_EMPTY_MSG: 'Keranjang kosong',
+  NO_PRODUCTS_MSG: 'Tidak ada produk ditemukan',
+  NO_WA_MSG: 'Nomor WA belum diset di profil',
   currency: new Intl.NumberFormat('id-ID'),
   toastTimer: null,
 
@@ -109,61 +117,64 @@ const Utils = {
 // STATE - Centralized app state
 // ==========================================================================
 
-const STATE = {
-  partner: null,
-  products: [],
-  category: 'ALL',
-  search: '',
-  cart: Utils.loadCart(),
+class StateManager {
+  constructor() {
+    this.state = {
+      partner: null,
+      products: [],
+      category: 'ALL',
+      search: '',
+      cart: Utils.loadCart()
+    };
+    this.subscribers = [];
+  }
+
+  set(key, value) {
+    this.state[key] = value;
+    this.notify();
+    if (key === 'cart') Utils.saveCart(value);
+  }
+
+  get(key) {
+    return this.state[key];
+  }
+
+  subscribe(fn) {
+    this.subscribers.push(fn);
+  }
+
+  notify() {
+    this.subscribers.forEach(fn => fn(this.state));
+  }
 
   syncCartWithProducts() {
-    this.cart = this.cart.filter(item => {
+    this.state.cart = this.state.cart.filter(item => {
       const product = this.findProduct(item.id);
       if (!product || product.stock <= 0) return false;
       item.qty = Math.min(item.qty, product.stock);
       return item.qty > 0;
     });
-    Utils.saveCart(this.cart);
-  },
+    Utils.saveCart(this.state.cart);
+  }
 
   findProduct(id) {
-    return this.products.find(p => p.id === id);
-  },
+    return this.state.products.find(p => p.id === id);
+  }
 
   getCartQuantity(id) {
-    const item = this.cart.find(item => item.id === id);
+    const item = this.state.cart.find(item => item.id === id);
     return item ? item.qty : 0;
   }
-};
+}
+
+const STATE = new StateManager();
 
 // ==========================================================================
 // DOM - Query selectors (only existing HTML elements)
 // ==========================================================================
 
 const Dom = {
-  get elements() {
-    return {
-      partnerName: document.getElementById('partnerName'),
-      partnerTagline: document.getElementById('partnerTagline'),
-      addressText: document.getElementById('addressText'),
-      searchInput: document.getElementById('searchInput'),
-      filterChips: document.getElementById('filterChips'),
-      resultsMeta: document.getElementById('resultsMeta'),
-      productGrid: document.getElementById('productGrid'),
-      emptyState: document.getElementById('emptyState'),
-      cartItems: document.getElementById('cartItems'),
-      cartEmpty: document.getElementById('cartEmpty'),
-      summaryTotal: document.getElementById('summaryTotal'),
-      checkoutButton: document.getElementById('checkoutButton'),
-      primaryCtaButton: document.getElementById('primaryCtaButton'),
-      contactSellerButton: document.getElementById('contactSellerButton'),
-      emptyResetButton: document.getElementById('emptyResetButton'),
-      navCartCount: document.getElementById('navCartCount'),
-      toast: document.getElementById('toast'),
-      themeToggle: document.getElementById('themeToggle'),
-      cartOverlay: document.getElementById('cartOverlay')
-    };
-  }
+  elements: null
 };
 
 // ==========================================================================
@@ -194,7 +205,7 @@ const Render = {
 
     Dom.elements.resultsMeta.textContent = visible.length 
       ? `${visible.length} produk tersedia`
-      : 'Tidak ada produk ditemukan';
+      : Utils.NO_PRODUCTS_MSG;
     
     Dom.elements.emptyState.classList.toggle('hidden', visible.length > 0);
 
@@ -205,7 +216,7 @@ const Render = {
 
     Dom.elements.productGrid.innerHTML = visible.map((product, i) => {
       const cartQty = STATE.getCartQuantity(product.id);
-      const lowStock = product.stock <= 5 && product.stock > 0;
+  const lowStock = product.stock <= CONSTANTS.STOCK_LOW_THRESHOLD && product.stock > 0;
       const outOfStock = product.stock === 0;
 
       return `
@@ -269,8 +280,8 @@ const Render = {
       </article>
     `).join('') || '';
 
-    if (items.length === 0) {
-      Dom.elements.cartItems.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Keranjang kosong</p>';
+  if (items.length === 0) {
+      Dom.elements.cartItems.innerHTML = `<p style="text-align: center; color: var(--text-secondary);">${Utils.CART_EMPTY_MSG}</p>`;
     }
   },
 
@@ -360,8 +371,12 @@ const Handlers = {
     const item = STATE.cart.find(item => item.id === id);
     if (!item) return;
     
-    item.qty = Math.max(1, Math.min(item.qty + delta, STATE.findProduct(id)?.stock || 999));
-    if (item.qty === 0) STATE.cart = STATE.cart.filter(i => i.id !== id);
+  const product = STATE.findProduct(id);
+  item.qty += delta;
+  item.qty = Math.max(0, Math.min(item.qty, product ? product.stock : 999));
+  if (item.qty <= 0) {
+    STATE.cart = STATE.cart.filter(i => i.id !== id);
+  }
     
     Utils.saveCart(STATE.cart);
     Render.products();
@@ -381,7 +396,7 @@ const Handlers = {
         Utils.showToast('Stok habis');
         return;
       }
-      item.qty++;
+      item.qty = Math.min(item.qty + 1, product.stock);
     } else {
       STATE.cart.push({ id, qty: 1 });
     }
@@ -408,12 +423,24 @@ const Handlers = {
       return product ? `- ${product.name} x${item.qty}` : '';
     }).filter(Boolean).join('\\n');
 
-    const url = `https://wa.me/62?text=Halo! Pesanan:%0A${message}%0A%0ATotal: ${Utils.formatCurrency(total)}`;
+    const profile = Utils.loadProfile();
+    const waNumber = profile.whatsapp || (STATE.partner?.wa || '6281234567890').replace(/[^\\d]/g, '');
+    if (!waNumber) {
+      Utils.showToast('Nomor WA belum diset di profil');
+      return;
+    }
+    const url = `https://wa.me/${waNumber}?text=Halo! Pesanan:%0A${message}%0A%0ATotal: ${Utils.formatCurrency(total)}`;
     window.open(url, '_blank');
   },
 
   contactSeller() {
-    window.open('https://wa.me/62?text=Halo Kantin Digital!');
+    const profile = Utils.loadProfile();
+    const waNumber = profile.whatsapp || (STATE.partner?.wa || '6281234567890').replace(/[^\\d]/g, '');
+    if (!waNumber) {
+      Utils.showToast('Nomor WA belum diset');
+      return;
+    }
+    window.open(`https://wa.me/${waNumber}?text=Halo Kantin Digital!`);
   },
 
   resetSearch() {
@@ -490,7 +517,7 @@ function init() {
   Dom.elements.productGrid?.addEventListener('click', e => Handlers.onProductClick(e));
   Dom.elements.cartItems?.addEventListener('click', e => Handlers.onCartClick(e));
   Dom.elements.emptyResetButton?.addEventListener('click', () => Handlers.resetSearch());
-  Dom.elements.primaryCtaButton?.addEventListener('click', () => document.getElementById('searchInput')?.focus());
+  Dom.elements.primaryCtaButton?.addEventListener('click', () => Dom.elements.searchInput?.focus());
   Dom.elements.contactSellerButton?.addEventListener('click', () => Handlers.contactSeller());
   Dom.elements.checkoutButton?.addEventListener('click', () => Handlers.checkout());
   Dom.elements.cartOverlay?.addEventListener('click', e => e.currentTarget.hidden = true);
