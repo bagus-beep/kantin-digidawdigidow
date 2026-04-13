@@ -6,7 +6,7 @@ import { Router } from './core/router.js';
 import { Performance } from './core/performance.js';
 import { Dom } from './ui/dom.js';
 import { Render } from './ui/render.js';
-import { ProductFeature } from './features/product.js';
+import { ProductFeature } from './feature/product.js';
 
 async function initData() {
   const products = await fetch('data/products.json').then(r => r.json());
