@@ -174,7 +174,33 @@ const STATE = new StateManager();
 // ==========================================================================
 
 const Dom = {
-  elements: null
+  elements: null,
+  
+  init() {
+    this.elements = {
+      searchInput: document.getElementById('searchInput'),
+      filterChips: document.getElementById('filterChips'),
+      productGrid: document.getElementById('productGrid'), 
+      emptyState: document.getElementById('emptyState'),
+      emptyResetButton: document.getElementById('emptyResetButton'),
+      resultsMeta: document.getElementById('resultsMeta'),
+      primaryCtaButton: document.getElementById('primaryCtaButton'),
+      contactSellerButton: document.getElementById('contactSellerButton'),
+      partnerName: document.getElementById('partnerName'),
+      partnerTagline: document.getElementById('partnerTagline'),
+      addressText: document.getElementById('addressText'),
+      cartItems: document.getElementById('cartItems'),
+      cartEmpty: document.getElementById('cartEmpty'),
+      summaryTotal: document.getElementById('summaryTotal'),
+      checkoutButton: document.getElementById('checkoutButton'),
+      cartOverlay: document.getElementById('cartOverlay'),
+      themeToggle: document.getElementById('themeToggle'),
+      toast: document.getElementById('toast')
+    };
+    
+    // Verify critical elements exist
+    if (!this.elements.searchInput) console.error('Missing #searchInput');
+  }
 };
 
 // ==========================================================================
@@ -317,8 +343,8 @@ const Handlers = {
         fetch('data/products.json').then(r => r.json())
       ]);
 
-      STATE.partner = partners[0] || { name: 'Kantin Digital', school: 'Sekolah' };
-      STATE.products = products.map(p => ({
+      STATE.set('partner', partners[0] || { name: 'Kantin Digital', school: 'Sekolah' });
+      STATE.set('products', products.map(p => ({
         id: String(p.produk_id),
         name: Utils.toTitleCase(p.produk_name),
         category: Utils.normalizeCategory(p.produk_kategori),
@@ -326,7 +352,15 @@ const Handlers = {
         price: Utils.parseNumber(p.produk_price),
         stock: Utils.parseNumber(p.produk_stock),
         image: p.produk_image || ''
-      })).filter(p => p.name && p.price > 0);
+      })).filter(p => p.name && p.price > 0));
+
+      // CRITICAL: Subscribe for auto-render - fixes bugs #2,3
+      STATE.subscribe((state) => {
+        Render.products();
+        Render.cart();
+        Render.filters();
+        Utils.updateNavCartBadge();
+      });
 
       STATE.syncCartWithProducts();
       Render.partnerInfo();
@@ -336,7 +370,7 @@ const Handlers = {
     } catch (error) {
       console.error('Data load failed:', error);
       Utils.showToast('Gagal memuat katalog');
-      Dom.elements.productGrid.innerHTML = '<p>Tidak dapat memuat produk</p>';
+      if (Dom.elements?.productGrid) Dom.elements.productGrid.innerHTML = '<p>Tidak dapat memuat produk</p>';
     }
   },
 
@@ -368,19 +402,27 @@ const Handlers = {
     const id = btn.dataset.id;
     const delta = Number(btn.dataset.delta);
     
-    const item = STATE.cart.find(item => item.id === id);
-    if (!item) return;
+    const product = STATE.findProduct(id);
+    if (!product) {
+      Utils.showToast('Produk tidak ditemukan');
+      return;
+    }
     
-  const product = STATE.findProduct(id);
-  item.qty += delta;
-  item.qty = Math.max(0, Math.min(item.qty, product ? product.stock : 999));
-  if (item.qty <= 0) {
-    STATE.cart = STATE.cart.filter(i => i.id !== id);
-  }
+    let item = STATE.cart.find(item => item.id === id);
+    if (!item) {
+      item = { id, qty: 0 };
+      STATE.cart.push(item);
+    }
     
-    Utils.saveCart(STATE.cart);
-    Render.products();
-    Render.cart();
+    item.qty += delta;
+    item.qty = Math.max(1, Math.min(item.qty, product.stock));
+    
+    if (item.qty <= 0) {
+      STATE.set('cart', STATE.cart.filter(i => i.id !== id));
+    } else {
+      Utils.saveCart(STATE.cart);
+      STATE.notify();
+    }
   },
 
   addToCart(id) {
@@ -511,7 +553,10 @@ const Handlers = {
 // ==========================================================================
 
 function init() {
-  // Event listeners
+  // CRITICAL: Initialize DOM elements FIRST
+  Dom.init();
+  
+  // Event listeners - now safe with Dom.elements
   Dom.elements.searchInput?.addEventListener('input', e => Handlers.onSearchInput(e));
   Dom.elements.filterChips?.addEventListener('click', e => Handlers.onFilterClick(e));
   Dom.elements.productGrid?.addEventListener('click', e => Handlers.onProductClick(e));
