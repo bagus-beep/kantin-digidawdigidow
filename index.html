@@ -1,169 +1,213 @@
 <!DOCTYPE html>
 <html lang="id" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#ff8a00">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ff8a00" />
   <title>Kantin Digital</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/style.css">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- App Entry -->
   <script type="module" src="js/app.js" defer></script>
 </head>
-<body>
 
+<body>
+  <!-- Background Layer -->
   <div class="page-chrome" aria-hidden="true">
     <div class="glow glow-one"></div>
     <div class="glow glow-two"></div>
     <div class="grid-wash"></div>
   </div>
 
-  <div class="app-shell">
-    <div class="pages">
-      <!-- Home Page -->
-      <section id="home" class="page active">
-        <div class="hero-card">
+  <!-- App Container -->
+  <main class="app-shell" role="application">
+
+    <!-- Pages Wrapper -->
+    <section class="pages">
+
+      <!-- ================= HOME ================= -->
+      <section id="home" class="page active" data-page>
+
+        <!-- Hero -->
+        <header class="hero-card">
           <div class="hero-copy">
             <p class="eyebrow">Belanja cepat untuk jam istirahat sekolah</p>
             <h1 id="partnerName">Memuat kantin...</h1>
-            <p id="partnerTagline" class="hero-tagline">
-              Menghubungkan makanan dan minuman favorit sekolahmu.
-            </p>
+            <p id="partnerTagline" class="hero-tagline"></p>
+
             <div class="hero-actions">
-              <button id="primaryCtaButton" class="primary-button large" type="button">🛒 Belanja Sekarang</button>
-              <button id="contactSellerButton" class="secondary-button" type="button">Hubungi Penjual</button>
+              <button id="primaryCtaButton" class="primary-button large" type="button">
+                🛒 Belanja
+              </button>
+              <button id="contactSellerButton" class="secondary-button" type="button">
+                Hubungi
+              </button>
             </div>
           </div>
-        </div>
+        </header>
 
+        <!-- Catalog -->
         <section class="catalog-layout">
-          <div class="section-heading">
-            <h2>Temukan menu favoritmu</h2>
+
+          <header class="section-heading">
+            <h2>Menu</h2>
+          </header>
+
+          <!-- Search -->
+          <div class="search-panel">
+            <input id="searchInput" type="search" placeholder="Cari produk..." autocomplete="off" />
           </div>
 
-          <section class="search-panel">
-            <input id="searchInput" type="search" placeholder="Cari produk...">
-          </section>
+          <!-- Filters -->
+          <div id="filterChips" class="filter-chips" role="tablist"></div>
 
+          <!-- Meta -->
+          <p id="resultsMeta" class="results-meta"></p>
 
-          <div id="filterChips" class="filter-chips"></div>
-<p id="resultsMeta">Memuat produk...</p>
-            <div id="filterChips" class="filter-chips"></div>
-          
+          <!-- Products -->
+          <div id="productGrid" class="product-grid" aria-live="polite"></div>
 
-          <section id="productGrid" class="product-grid"></section>
-          <section id="emptyState" class="empty-state hidden">
+          <!-- Empty -->
+          <div id="emptyState" class="empty-state hidden">
             <p>Tidak ditemukan</p>
-            <button id="emptyResetButton" class="primary-button">Tampilkan semua</button>
-          </section>
+            <button id="emptyResetButton" class="primary-button">Reset</button>
+          </div>
         </section>
 
+        <!-- Trust -->
         <section class="trust-grid">
           <article class="feature-card">
-            <h3>Titik jual jelas</h3>
-            <p id="addressText">Alamat akan tampil di sini.</p>
+            <h3>Lokasi</h3>
+            <p id="addressText"></p>
           </article>
+
           <article class="feature-card">
-            <h3>Layanan cepat</h3>
-            <p>Checkout via WhatsApp.</p>
+            <h3>Layanan</h3>
+            <p>Checkout via WhatsApp</p>
           </article>
         </section>
       </section>
 
+      <!-- ================= CART ================= -->
+      <section id="cart" class="page" data-page>
+        <header>
+          <h1>Keranjang</h1>
+        </header>
 
-      <!-- Cart Page -->
-      <section id="cart" class="page">
-        <div class="cart-page">
-          <header>
-            <h1>Keranjang</h1>
-          </header>
-          <div id="cartItems" class="cart-items"></div>
-          <div id="cartEmpty" class="cart-empty">
-            <h3>Keranjang kosong</h3>
-            <p>Pilih produk dari beranda.</p>
-          </div>
-          <div class="cart-summary">
-            <div class="cart-summary-row">
-              <span>Total</span>
-              <strong id="summaryTotal">Rp 0</strong>
-            </div>
-            <button id="checkoutButton" class="primary-button" disabled>Checkout via WhatsApp</button>
-          </div>
+        <div id="cartItems" class="cart-items"></div>
+
+        <div id="cartEmpty" class="cart-empty">
+          <h3>Kosong</h3>
+          <p>Tambahkan produk</p>
         </div>
+
+        <footer class="cart-summary">
+          <div class="cart-summary-row">
+            <span>Total</span>
+            <strong id="summaryTotal">Rp 0</strong>
+          </div>
+
+          <button id="checkoutButton" class="primary-button" disabled>
+            Checkout
+          </button>
+        </footer>
       </section>
 
-
-      <!-- Transactions Page -->
-      <section id="transactions" class="page">
+      <!-- ================= TRANSACTIONS ================= -->
+      <section id="transactions" class="page" data-page>
         <h1>Riwayat</h1>
         <div class="transactions-list">
           <div class="transaction-card">
-            <h3>Riwayat pesanan kosong</h3>
-            <p>Transaksi akan tercatat di sini.</p>
+            <p>Belum ada transaksi</p>
           </div>
         </div>
       </section>
 
-      <!-- Profile Page -->
-      <section id="profile" class="page">
+      <!-- ================= PROFILE ================= -->
+      <section id="profile" class="page" data-page>
         <h1>Profil</h1>
+
         <div class="profile-grid">
+
+          <!-- User Info -->
           <div class="profile-card">
-            <h3>Informasi Pengguna</h3>
-            <div class="profile-input-field">
-              <label>Nama: <input type="text" placeholder="Masukkan nama" class="profile-input"></label>
-              <label>Sekolah: <input type="text" placeholder="Nama sekolah" class="profile-input"></label>
-              <label>Nomor WA: <input type="tel" placeholder="08xx" class="profile-input"></label>
-            </div>
+            <h3>Pengguna</h3>
+
+            <label>
+              Nama
+              <input data-key="name" class="profile-input" type="text" />
+            </label>
+
+            <label>
+              Sekolah
+              <input data-key="school" class="profile-input" type="text" />
+            </label>
+
+            <label>
+              WhatsApp
+              <input data-key="whatsapp" class="profile-input" type="tel" />
+            </label>
           </div>
+
+          <!-- Theme -->
           <div class="profile-card">
             <h3>Tema</h3>
-            <div class="theme-toggle">
-<span>Light</span>
-              <input type="checkbox" id="themeToggle" checked>
+            <label class="theme-toggle">
+              <span>Light</span>
+              <input type="checkbox" id="themeToggle" />
               <span>Dark</span>
-            
-            </div>
+            </label>
           </div>
+
+          <!-- Settings -->
           <div class="profile-card">
-            <h3>Settings</h3>
-            <ul class="settings-list">
-              <li><label><input type="checkbox"> Notifikasi promo</label></li>
-              <li><label><input type="checkbox"> Auto-checkout</label></li>
-            </ul>
+            <h3>Pengaturan</h3>
+            <label><input type="checkbox" /> Notifikasi</label>
+            <label><input type="checkbox" /> Auto checkout</label>
           </div>
+
         </div>
       </section>
-    </div>
 
+    </section>
 
     <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-      <a href="#home" class="nav-item active" data-page="home">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-label">Beranda</span>
-      </a>
-      <a href="#cart" class="nav-item" data-page="cart">
-        <span class="nav-icon">🛒</span>
-        <span class="nav-label">Keranjang</span>
-        <span id="navCartCount" class="nav-cart-badge">0</span>
-      </a>
-      <a href="#transactions" class="nav-item" data-page="transactions">
-        <span class="nav-icon">📋</span>
-        <span class="nav-label">Riwayat</span>
-      </a>
-      <a href="#profile" class="nav-item" data-page="profile">
-        <span class="nav-icon">👤</span>
-        <span class="nav-label">Profil</span>
-      </a>
-    </nav>
-  </div>
+    <nav class="bottom-nav" role="navigation">
+      <button class="nav-item active" data-page="home">
+        <span>🏠</span>
+        <small>Home</small>
+      </button>
 
-  <!-- Overlays/Modals preserved -->
-  <button id="cartOverlay" class="cart-overlay" hidden></button>
-  <div id="toast" class="toast"></div>
+      <button class="nav-item" data-page="cart">
+        <span>🛒</span>
+        <small>Cart</small>
+        <span id="navCartCount" class="nav-cart-badge">0</span>
+      </button>
+
+      <button class="nav-item" data-page="transactions">
+        <span>📋</span>
+        <small>Riwayat</small>
+      </button>
+
+      <button class="nav-item" data-page="profile">
+        <span>👤</span>
+        <small>Profil</small>
+      </button>
+    </nav>
+
+  </main>
+
+  <!-- Overlay -->
+  <div id="cartOverlay" class="cart-overlay" hidden></div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status"></div>
 
 </body>
 </html>
-
-
