@@ -406,25 +406,110 @@ a { text-decoration: none; color: inherit; }
   -webkit-backdrop-filter: blur(4px);
 }
 
-
-.toast {
-  left: 50%;
-  bottom: 94px;
-  transform: translateX(-50%);
-  padding: var(--spacing-sm);
-  border-radius: 0.5rem;
-  background: var(--text-primary);
-  color: white;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  opacity: 0;
-  transform: translateX(-50%) translateY(1rem);
-  transition: all var(--transition);
-}
-
 .toast.is-visible {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+/* Secondary Button for CTA hierarchy */
+.secondary-button {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.primary-button.large {
+  font-size: 1.1rem;
+  padding: 1rem 1.5rem;
+}
+
+/* Hover/Active states */
+.product-card:hover, .add-to-cart:hover {
+  transform: translateY(-2px);
+}
+
+.primary-button:hover, .secondary-button:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+.nav-item.active:hover {
+  color: var(--accent-deep);
+}
+
+/* Active states */
+.primary-button:active, .secondary-button:active, .qty-btn:active {
+  transform: scale(0.98);
+}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 200ms ease;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+}
+
+.modal-open {
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Enhanced empty state */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-state::before {
+  content: '😢';
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-fallback {
+  background: var(--danger);
+  color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+}
+
+/* Theme selector fix - will apply after HTML change */
+html[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --accent: #ff8a00;
+  --accent-gold: #f59e0b;
+  --border: #e2e8f0;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+html[data-theme="dark"] {
+  --bg-primary: #1e3a8a;
+  --bg-secondary: #1e40af;
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --accent: #f59e0b;
+  --accent-gold: #fbbf24;
+  --border: #334155;
 }
 
 /* Primary Button */
@@ -464,4 +549,3 @@ a { text-decoration: none; color: inherit; }
 @media (min-width: 980px) {
   /* Add complex desktop hero/product styles if needed */
 }
-
