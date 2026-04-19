@@ -14,7 +14,7 @@ function visibleProducts() {
 
 function productSubtitle(product) {
   const school = product.school || STATE.get('partner')?.school;
-  return school ? `Tersedia di ${school}` : 'Siap dipesan via WhatsApp';
+  return school ? school : 'Siap dipesan via WhatsApp';
 }
 
 export const Render = {
@@ -136,6 +136,7 @@ export const Render = {
       const qty = STATE.cartQty(product.id);
       const stockLabel = stock <= 5 ? `Sisa ${stock}` : `Stok ${stock}`;
       const image = Utils.escapeHtml(product.image || 'favicon.svg');
+      const cartLabel = qty > 0 ? `${qty} di keranjang` : 'Belum di keranjang';
 
       return `
         <article class="product-card">
@@ -146,22 +147,25 @@ export const Render = {
               loading="lazy"
               referrerpolicy="no-referrer"
             />
-            <span class="category-pill">${Utils.escapeHtml(Utils.title(product.category))}</span>
+            <div class="product-badges">
+              <span class="category-pill">${Utils.escapeHtml(Utils.title(product.category))}</span>
+              <span class="stock-badge ${stock <= 5 ? 'is-low' : ''}">${Utils.escapeHtml(stockLabel)}</span>
+            </div>
           </div>
 
           <div class="product-body">
-            <div>
+            <div class="product-copy">
               <h3 class="product-name">${Utils.escapeHtml(product.name)}</h3>
               <p class="product-subtitle">${Utils.escapeHtml(productSubtitle(product))}</p>
             </div>
 
             <div class="product-meta">
               <strong class="product-price">${Utils.formatCurrency(product.price)}</strong>
-              <span class="stock-badge ${stock <= 5 ? 'is-low' : ''}">${Utils.escapeHtml(stockLabel)}</span>
+              <span class="cart-hint ${qty > 0 ? 'is-active' : ''}">${Utils.escapeHtml(cartLabel)}</span>
             </div>
 
             <div class="product-actions">
-              <button class="primary-button" type="button" data-action="add" data-id="${product.id}">
+              <button class="primary-button product-cta" type="button" data-action="add" data-id="${product.id}">
                 Tambah
               </button>
 
@@ -171,7 +175,7 @@ export const Render = {
                   <span class="qty-value">${qty}</span>
                   <button class="qty-button" type="button" data-action="increase" data-id="${product.id}" aria-label="Tambah ${Utils.escapeHtml(product.name)}">+</button>
                 </div>
-              ` : '<span class="results-meta">Belum di keranjang</span>'}
+              ` : ''}
             </div>
           </div>
         </article>
