@@ -1,31 +1,36 @@
-// =========================================
-// performance.js (Optimization Layer)
-// =========================================
 export const Performance = {
-  lazyImages() {
-    const images = document.querySelectorAll('img[data-src]');
+  observer: null,
+  observed: new WeakSet(),
 
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
+  lazyImages(root = document) {
+    const images = root.querySelectorAll('img[data-src]');
+    if (!images.length) return;
 
-        const img = entry.target;
+    if (!('IntersectionObserver' in window)) {
+      images.forEach(img => {
         img.src = img.dataset.src;
         img.removeAttribute('data-src');
-        observer.unobserve(img);
       });
-    });
+      return;
+    }
 
-    images.forEach(img => observer.observe(img));
-  },
+    if (!this.observer) {
+      this.observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
 
-  virtualList(container, items, renderItem) {
-    const fragment = document.createDocumentFragment();
-    items.forEach(item => {
-      const el = renderItem(item);
-      fragment.appendChild(el);
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.removeAttribute('data-src');
+          this.observer.unobserve(img);
+        });
+      }, { rootMargin: '120px 0px' });
+    }
+
+    images.forEach(img => {
+      if (this.observed.has(img)) return;
+      this.observed.add(img);
+      this.observer.observe(img);
     });
-    container.innerHTML = '';
-    container.appendChild(fragment);
   }
 };

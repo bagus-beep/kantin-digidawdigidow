@@ -1,27 +1,38 @@
-// =========================================
-// router.js (SPA Navigation System)
-// =========================================
 export const Router = {
   init() {
-    window.addEventListener('hashchange', this.handleRoute);
-    this.handleRoute();
+    document.addEventListener('click', event => {
+      const button = event.target.closest('.nav-item[data-page]');
+      if (!button) return;
+
+      const { page } = button.dataset;
+      if (!page) return;
+
+      if (location.hash !== `#${page}`) {
+        location.hash = page;
+        return;
+      }
+
+      this.handleRoute();
+    });
+
+    window.addEventListener('hashchange', () => this.handleRoute());
+
+    if (!location.hash) {
+      location.hash = 'home';
+    } else {
+      this.handleRoute();
+    }
   },
 
   handleRoute() {
     const page = location.hash.replace('#', '') || 'home';
 
-    document.querySelectorAll('[data-page]').forEach(el => {
-      el.classList.remove('active');
+    document.querySelectorAll('[data-page].page').forEach(section => {
+      section.classList.toggle('active', section.id === page);
     });
 
-    document.querySelectorAll('.nav-item').forEach(el => {
-      el.classList.remove('active');
+    document.querySelectorAll('.nav-item').forEach(button => {
+      button.classList.toggle('active', button.dataset.page === page);
     });
-
-    const targetPage = document.getElementById(page);
-    const targetNav = document.querySelector(`.nav-item[data-page="${page}"]`);
-
-    targetPage?.classList.add('active');
-    targetNav?.classList.add('active');
   }
 };

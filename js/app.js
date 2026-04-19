@@ -1,40 +1,107 @@
-// ================================
-// /js/app.js
-// ================================
 import { STATE } from './core/state.js';
 import { Router } from './core/router.js';
-import { Performance } from './core/performance.js';
+import { Utils } from './core/utils.js';
 import { Dom } from './ui/dom.js';
 import { Render } from './ui/render.js';
 import { ProductFeature } from './feature/product.js';
+import { CartFeature } from './feature/cart.js';
 
-async function initData() {
-  const products = await fetch('data/products.json').then(r => r.json());
+async function fetchJson(path) {
+  const response = await fetch(path);
 
-  STATE.set('products', products.map(p => ({
-    id: String(p.produk_id),
-    name: p.produk_name,
-    price: Number(p.produk_price),
-    category: p.produk_kategori
-  })));
+  if (!response.ok) {
+    throw new Error(`Gagal memuat ${path}`);
+  }
+
+  return response.json();
 }
 
-function init() {
+function mapPartner(rawPartner) {
+  return {
+    id: String(rawPartner.mitra_id || ''),
+    name: Utils.compactText(rawPartner.mitra_name || 'Kantin Digital'),
+    ownerName: Utils.compactText(rawPartner.owner_name || ''),
+    phone: Utils.compactText(rawPartner.phone_owner || ''),
+    email: Utils.compactText(rawPartner.email_owner || ''),
+    category: Utils.compactText(rawPartner.kategori || ''),
+    school: Utils.compactText(rawPartner.sekolah || ''),
+    address: Utils.compactText(rawPartner.address_owner || '')
+  };
+}
+
+function mapProduct(rawProduct, partnersById) {
+  const partner = partnersById.get(String(rawProduct.mitra_id || ''));
+
+  return {
+    id: String(rawProduct.produk_id || ''),
+    partnerId: String(rawProduct.mitra_id || ''),
+    name: Utils.compactText(rawProduct.produk_name || 'Produk tanpa nama'),
+    price: Utils.parseNumber(rawProduct.produk_price),
+    stock: Utils.parseNumber(rawProduct.produk_stock),
+    category: Utils.compactText(rawProduct.produk_kategori || 'Lainnya').toUpperCase(),
+    image: Utils.compactText(rawProduct.produk_image || ''),
+    school: Utils.compactText(rawProduct.sekolah || partner?.school || '')
+  };
+}
+
+async function initData() {
+  const [partnersRaw, productsRaw] = await Promise.all([
+    fetchJson('data/partners.json'),
+    fetchJson('data/products.json')
+  ]);
+
+  const partners = partnersRaw.map(mapPartner);
+  const partnersById = new Map(partners.map(partner => [partner.id, partner]));
+  const allProducts = productsRaw.map(product => mapProduct(product, partnersById));
+
+  const primaryPartnerId =
+    allProducts.find(product => partnersById.has(product.partnerId))?.partnerId ||
+    partners[0]?.id ||
+    '';
+
+  const activePartner = partnersById.get(primaryPartnerId) || partners[0] || null;
+  const filteredProducts = activePartner
+    ? allProducts.filter(product => product.partnerId === activePartner.id)
+    : allProducts;
+
+  STATE.patch({
+    isLoaded: true,
+    partners,
+    partner: activePartner,
+    products: filteredProducts
+  });
+}
+
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {
+      // Ignore registration errors in local preview mode.
+    });
+  });
+}
+
+async function init() {
   Dom.init();
+  Render.app();
 
   STATE.subscribe(() => {
-    Render.products();
-    Render.cart();
-  });
-
-  Dom.searchInput.addEventListener('input', e => {
-    STATE.set('search', e.target.value.toLowerCase());
+    Render.app();
   });
 
   ProductFeature.init();
+  CartFeature.init();
   Router.init();
-  Performance.lazyImages();
-  initData();
+  registerServiceWorker();
+
+  await initData();
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  init().catch(error => {
+    console.error(error);
+    STATE.set('isLoaded', true);
+    Dom.showToast('Gagal memuat katalog. Coba refresh halaman.');
+  });
+});

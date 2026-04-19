@@ -3,211 +3,282 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ff8a00" />
+  <meta name="theme-color" content="#e87817" />
   <title>Kantin Digital</title>
+  <meta
+    name="description"
+    content="Kantin Digital membantu siswa memesan makanan dan minuman sekolah dengan cepat lewat WhatsApp."
+  />
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-
-  <!-- Styles -->
   <link rel="stylesheet" href="css/style.css" />
-
-  <!-- App Entry -->
   <script type="module" src="js/app.js" defer></script>
 </head>
 
 <body>
-  <!-- Background Layer -->
   <div class="page-chrome" aria-hidden="true">
     <div class="glow glow-one"></div>
     <div class="glow glow-two"></div>
     <div class="grid-wash"></div>
   </div>
 
-  <!-- App Container -->
-  <main class="app-shell" role="application">
-
-    <!-- Pages Wrapper -->
+  <main class="app-shell" role="application" aria-label="Aplikasi Kantin Digital">
     <section class="pages">
-
-      <!-- ================= HOME ================= -->
       <section id="home" class="page active" data-page>
-
-        <!-- Hero -->
         <header class="hero-card">
           <div class="hero-copy">
-            <p class="eyebrow">Belanja cepat untuk jam istirahat sekolah</p>
+            <p class="eyebrow">Pesan cepat untuk jam istirahat sekolah</p>
             <h1 id="partnerName">Memuat kantin...</h1>
-            <p id="partnerTagline" class="hero-tagline"></p>
+            <p id="partnerTagline" class="hero-tagline">
+              Menyiapkan katalog kantin dan informasi partner.
+            </p>
 
             <div class="hero-actions">
               <button id="primaryCtaButton" class="primary-button large" type="button">
-                🛒 Belanja
+                <span class="button-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 6h15l-1.4 6.1a2 2 0 0 1-2 1.5H9.2a2 2 0 0 1-2-1.5L5.4 4.8A1 1 0 0 0 4.4 4H3"></path>
+                    <circle cx="9" cy="19" r="1.7"></circle>
+                    <circle cx="17" cy="19" r="1.7"></circle>
+                  </svg>
+                </span>
+                <span>Belanja sekarang</span>
               </button>
+
               <button id="contactSellerButton" class="secondary-button" type="button">
-                Hubungi
+                <span class="button-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M21 11.5a8.4 8.4 0 0 1-1.1 4.1A8.9 8.9 0 0 1 12 20a8.6 8.6 0 0 1-4.2-1.1L3 20l1.2-4.6A8.5 8.5 0 0 1 3 11.5 8.9 8.9 0 0 1 12 3a8.9 8.9 0 0 1 9 8.5Z"></path>
+                  </svg>
+                </span>
+                <span>Hubungi penjual</span>
               </button>
             </div>
           </div>
+
+          <div class="hero-stats" aria-label="Ringkasan kantin">
+            <article class="stat-card">
+              <span class="stat-label">Produk aktif</span>
+              <strong id="heroProductCount">0</strong>
+            </article>
+
+            <article class="stat-card">
+              <span class="stat-label">Kategori</span>
+              <strong id="heroCategoryCount">0</strong>
+            </article>
+
+            <article class="stat-card stat-card-wide">
+              <span class="stat-label">Pengelola</span>
+              <strong id="heroOwnerName">Memuat data partner</strong>
+            </article>
+          </div>
         </header>
 
-        <!-- Catalog -->
-        <section class="catalog-layout">
-
+        <section class="catalog-layout" id="catalogSection">
           <header class="section-heading">
-            <h2>Menu</h2>
+            <div>
+              <p class="section-kicker">Katalog</p>
+              <h2>Menu favorit hari ini</h2>
+            </div>
+            <p class="section-note">Cari produk, pilih kategori, lalu checkout via WhatsApp.</p>
           </header>
 
-          <!-- Search -->
           <div class="search-panel">
-            <input id="searchInput" type="search" placeholder="Cari produk..." autocomplete="off" />
+            <label class="search-field">
+              <span class="search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="11" cy="11" r="6.5"></circle>
+                  <path d="m16 16 4 4"></path>
+                </svg>
+              </span>
+              <input
+                id="searchInput"
+                type="search"
+                placeholder="Cari makanan atau minuman..."
+                autocomplete="off"
+              />
+            </label>
           </div>
 
-          <!-- Filters -->
-          <div id="filterChips" class="filter-chips" role="tablist"></div>
+          <div id="filterChips" class="filter-chips" role="tablist" aria-label="Filter kategori"></div>
 
-          <!-- Meta -->
-          <p id="resultsMeta" class="results-meta"></p>
+          <div class="results-toolbar">
+            <p id="resultsMeta" class="results-meta">Memuat katalog...</p>
+          </div>
 
-          <!-- Products -->
           <div id="productGrid" class="product-grid" aria-live="polite"></div>
 
-          <!-- Empty -->
           <div id="emptyState" class="empty-state hidden">
-            <p>Tidak ditemukan</p>
-            <button id="emptyResetButton" class="primary-button">Reset</button>
+            <h3>Tidak ada produk yang cocok</h3>
+            <p>Coba ubah kata kunci pencarian atau reset filter kategori.</p>
+            <button id="emptyResetButton" class="primary-button" type="button">Reset filter</button>
           </div>
         </section>
 
-        <!-- Trust -->
         <section class="trust-grid">
           <article class="feature-card">
-            <h3>Lokasi</h3>
-            <p id="addressText"></p>
+            <p class="section-kicker">Lokasi</p>
+            <h3>Sekolah & alamat partner</h3>
+            <p id="schoolText">Memuat sekolah partner...</p>
+            <p id="addressText">Memuat alamat partner...</p>
           </article>
 
           <article class="feature-card">
-            <h3>Layanan</h3>
-            <p>Checkout via WhatsApp</p>
+            <p class="section-kicker">Layanan</p>
+            <h3>Pemesanan singkat, jelas, dan cepat</h3>
+            <p>Katalog otomatis terhubung dengan data partner, stok, dan checkout WhatsApp.</p>
+            <p id="ownerText">Kontak partner sedang dimuat...</p>
           </article>
         </section>
       </section>
 
-      <!-- ================= CART ================= -->
       <section id="cart" class="page" data-page>
-        <header>
-          <h1>Keranjang</h1>
+        <header class="section-heading">
+          <div>
+            <p class="section-kicker">Keranjang</p>
+            <h1>Ringkasan pesanan</h1>
+          </div>
+          <p class="section-note">Atur jumlah produk lalu lanjutkan checkout ke penjual.</p>
         </header>
 
         <div id="cartItems" class="cart-items"></div>
 
         <div id="cartEmpty" class="cart-empty">
-          <h3>Kosong</h3>
-          <p>Tambahkan produk</p>
+          <h3>Keranjang masih kosong</h3>
+          <p>Pilih produk dari halaman menu untuk mulai berbelanja.</p>
+          <button id="cartBrowseButton" class="secondary-button" type="button">Kembali ke katalog</button>
         </div>
 
         <footer class="cart-summary">
           <div class="cart-summary-row">
-            <span>Total</span>
+            <span>Total item</span>
+            <strong id="summaryCount">0 item</strong>
+          </div>
+          <div class="cart-summary-row">
+            <span>Total belanja</span>
             <strong id="summaryTotal">Rp 0</strong>
           </div>
 
-          <button id="checkoutButton" class="primary-button" disabled>
-            Checkout
+          <button id="checkoutButton" class="primary-button large full-width" type="button" disabled>
+            Checkout via WhatsApp
           </button>
         </footer>
       </section>
 
-      <!-- ================= TRANSACTIONS ================= -->
       <section id="transactions" class="page" data-page>
-        <h1>Riwayat</h1>
-        <div class="transactions-list">
-          <div class="transaction-card">
-            <p>Belum ada transaksi</p>
+        <header class="section-heading">
+          <div>
+            <p class="section-kicker">Riwayat</p>
+            <h1>Checkout terakhir</h1>
           </div>
+          <p class="section-note">Riwayat ini tersimpan lokal di perangkat untuk referensi cepat.</p>
+        </header>
+
+        <div id="transactionsList" class="transactions-list"></div>
+
+        <div id="transactionsEmpty" class="transactions-empty">
+          <h3>Belum ada checkout</h3>
+          <p>Riwayat akan muncul setelah Anda menekan tombol checkout.</p>
         </div>
       </section>
 
-      <!-- ================= PROFILE ================= -->
       <section id="profile" class="page" data-page>
-        <h1>Profil</h1>
+        <header class="section-heading">
+          <div>
+            <p class="section-kicker">Profil</p>
+            <h1>Data pembeli</h1>
+          </div>
+          <p class="section-note">Isi data ini agar pesan WhatsApp checkout lebih rapi dan cepat diproses.</p>
+        </header>
 
         <div class="profile-grid">
+          <article class="profile-card">
+            <h3>Identitas pembeli</h3>
 
-          <!-- User Info -->
-          <div class="profile-card">
-            <h3>Pengguna</h3>
-
-            <label>
-              Nama
-              <input data-key="name" class="profile-input" type="text" />
+            <label class="form-field">
+              <span>Nama</span>
+              <input data-key="name" class="profile-input" type="text" placeholder="Contoh: Dhiwa" />
             </label>
 
-            <label>
-              Sekolah
-              <input data-key="school" class="profile-input" type="text" />
+            <label class="form-field">
+              <span>Sekolah</span>
+              <input data-key="school" class="profile-input" type="text" placeholder="Contoh: SMA Hang Tuah 2" />
             </label>
 
-            <label>
-              WhatsApp
-              <input data-key="whatsapp" class="profile-input" type="tel" />
+            <label class="form-field">
+              <span>WhatsApp</span>
+              <input data-key="whatsapp" class="profile-input" type="tel" placeholder="08xxxxxxxxxx" />
             </label>
-          </div>
+          </article>
 
-          <!-- Theme -->
-          <div class="profile-card">
-            <h3>Tema</h3>
-            <label class="theme-toggle">
-              <span>Light</span>
+          <article class="profile-card">
+            <h3>Tampilan aplikasi</h3>
+            <label class="theme-toggle" for="themeToggle">
+              <span>Mode terang</span>
               <input type="checkbox" id="themeToggle" />
-              <span>Dark</span>
+              <span>Mode gelap</span>
             </label>
-          </div>
+            <p class="profile-note">Tema tersimpan otomatis di browser ini.</p>
+          </article>
 
-          <!-- Settings -->
-          <div class="profile-card">
-            <h3>Pengaturan</h3>
-            <label><input type="checkbox" /> Notifikasi</label>
-            <label><input type="checkbox" /> Auto checkout</label>
-          </div>
-
+          <article class="profile-card">
+            <h3>Partner aktif</h3>
+            <p id="profilePartnerName">Memuat partner aktif...</p>
+            <p id="profilePartnerInfo" class="profile-note">
+              Informasi sekolah dan kontak penjual akan muncul di sini.
+            </p>
+          </article>
         </div>
       </section>
-
     </section>
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav" role="navigation">
-      <button class="nav-item active" data-page="home">
-        <span>🏠</span>
+    <nav class="bottom-nav" role="navigation" aria-label="Navigasi utama">
+      <button class="nav-item active" data-page="home" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 10.5 12 3l9 7.5"></path>
+            <path d="M5.5 9.5V20h13V9.5"></path>
+          </svg>
+        </span>
         <small>Home</small>
       </button>
 
-      <button class="nav-item" data-page="cart">
-        <span>🛒</span>
+      <button class="nav-item" data-page="cart" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M4 6h15l-1.4 6.1a2 2 0 0 1-2 1.5H9.2a2 2 0 0 1-2-1.5L5.4 4.8A1 1 0 0 0 4.4 4H3"></path>
+            <circle cx="9" cy="19" r="1.7"></circle>
+            <circle cx="17" cy="19" r="1.7"></circle>
+          </svg>
+        </span>
         <small>Cart</small>
-        <span id="navCartCount" class="nav-cart-badge">0</span>
+        <span id="navCartCount" class="nav-cart-badge" hidden>0</span>
       </button>
 
-      <button class="nav-item" data-page="transactions">
-        <span>📋</span>
+      <button class="nav-item" data-page="transactions" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M7 4h10l3 3v13H7z"></path>
+            <path d="M17 4v3h3"></path>
+            <path d="M10 11h7M10 15h7"></path>
+          </svg>
+        </span>
         <small>Riwayat</small>
       </button>
 
-      <button class="nav-item" data-page="profile">
-        <span>👤</span>
+      <button class="nav-item" data-page="profile" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="8" r="3.5"></circle>
+            <path d="M5 20a7 7 0 0 1 14 0"></path>
+          </svg>
+        </span>
         <small>Profil</small>
       </button>
     </nav>
-
   </main>
 
-  <!-- Overlay -->
-  <div id="cartOverlay" class="cart-overlay" hidden></div>
-
-  <!-- Toast -->
-  <div id="toast" class="toast" role="status"></div>
-
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

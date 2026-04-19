@@ -1,21 +1,71 @@
-// ================================
-// /js/features/product.js
-// ================================
 import { STATE } from '../core/state.js';
-import { Render } from '../ui/render.js';
+import { Utils } from '../core/utils.js';
+import { Dom } from '../ui/dom.js';
+
+function updateProductQuantity(productId, delta) {
+  const product = STATE.findProduct(productId);
+  if (!product) return;
+
+  const nextQty = STATE.cartQty(productId) + delta;
+  const cappedQty = Math.min(Math.max(nextQty, 0), product.stock || 99);
+
+  STATE.setCartQty(productId, cappedQty);
+}
 
 export const ProductFeature = {
   init() {
-    document.addEventListener('click', e => {
-      const btn = e.target.closest('.add');
-      if (!btn) return;
+    Dom.searchInput.addEventListener('input', event => {
+      STATE.set('search', Utils.normalize(event.target.value));
+    });
 
-      const id = btn.dataset.id;
-      STATE.update('cart', cart => {
-        const item = cart.find(i => i.id === id);
-        if (item) item.qty++;
-        else cart.push({ id, qty: 1 });
-        return [...cart];
+    Dom.filterChips.addEventListener('click', event => {
+      const chip = event.target.closest('[data-category]');
+      if (!chip) return;
+
+      STATE.set('category', chip.dataset.category);
+    });
+
+    Dom.productGrid.addEventListener('click', event => {
+      const actionButton = event.target.closest('[data-action][data-id]');
+      if (!actionButton) return;
+
+      const { action, id } = actionButton.dataset;
+
+      if (action === 'add' || action === 'increase') {
+        const product = STATE.findProduct(id);
+        const currentQty = STATE.cartQty(id);
+
+        if (product && currentQty >= product.stock) {
+          Dom.showToast(`Stok ${product.name} sudah habis di katalog.`);
+          return;
+        }
+
+        updateProductQuantity(id, 1);
+
+        if (action === 'add') {
+          Dom.showToast('Produk ditambahkan ke keranjang.');
+        }
+
+        return;
+      }
+
+      if (action === 'decrease') {
+        updateProductQuantity(id, -1);
+      }
+    });
+
+    Dom.emptyResetButton.addEventListener('click', () => {
+      Dom.searchInput.value = '';
+      STATE.patch({
+        category: 'ALL',
+        search: ''
+      });
+    });
+
+    Dom.primaryCtaButton.addEventListener('click', () => {
+      Dom.catalogSection?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
       });
     });
   }
