@@ -37,6 +37,25 @@ export const Utils = {
     return String(value || '').replace(/\s+/g, ' ').trim();
   },
 
+  presentText(value) {
+    const preserveUpper = new Set(['SD', 'SMP', 'SMA', 'SMK', 'MI', 'MTS', 'MA', 'TK', 'RT', 'RW']);
+
+    return this.compactText(value)
+      .split(' ')
+      .filter(Boolean)
+      .map(word => {
+        const normalized = word.replace(/[.,]/g, '');
+        const upper = normalized.toUpperCase();
+
+        if (preserveUpper.has(upper) || normalized.length === 1 || /^\d+$/.test(normalized)) {
+          return upper;
+        }
+
+        return upper.charAt(0) + upper.slice(1).toLowerCase();
+      })
+      .join(' ');
+  },
+
   escapeHtml(value) {
     const div = document.createElement('div');
     div.textContent = value;

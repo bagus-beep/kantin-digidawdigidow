@@ -64,19 +64,20 @@ export const Render = {
     const ownerName = partner?.ownerName || 'Pengelola belum tersedia';
     const address = partner?.address || 'Alamat partner belum tersedia';
     const phone = partner?.phone ? `WhatsApp ${partner.phone}` : 'Kontak penjual belum tersedia';
+    const checkoutOwner = partner?.ownerName || 'penjual';
 
     Dom.partnerName.textContent = partnerName;
     Dom.partnerTagline.textContent = partner
-      ? `Katalog ${partnerName} untuk ${school}. Checkout langsung ke penjual, tanpa langkah yang ribet.`
+      ? `${school}. Pilih menu favorit, atur jumlah, lalu checkout cepat ke ${checkoutOwner} via WhatsApp.`
       : 'Data partner belum ditemukan. Pastikan berkas partner dan produk tersedia.';
     Dom.heroProductCount.textContent = String(products.length);
     Dom.heroCategoryCount.textContent = String(categories.length);
     Dom.heroOwnerName.textContent = ownerName;
     Dom.schoolText.textContent = school;
     Dom.addressText.textContent = address;
-    Dom.ownerText.textContent = `${ownerName} • ${phone}`;
+    Dom.ownerText.textContent = `${ownerName} | ${phone}`;
     Dom.profilePartnerName.textContent = partnerName;
-    Dom.profilePartnerInfo.textContent = `${school} • ${address}`;
+    Dom.profilePartnerInfo.textContent = `${school} | ${address}`;
     document.title = `${partnerName} | Kantin Digital`;
   },
 
@@ -202,7 +203,7 @@ export const Render = {
         <div class="cart-card-head">
           <div class="cart-card-title">
             <h3>${Utils.escapeHtml(item.name)}</h3>
-            <p>${Utils.escapeHtml(Utils.title(item.category))} • ${Utils.formatCurrency(item.price)}</p>
+            <p>${Utils.escapeHtml(Utils.title(item.category))} | ${Utils.formatCurrency(item.price)}</p>
           </div>
           <strong class="cart-line-total">${Utils.formatCurrency(item.subtotal)}</strong>
         </div>
@@ -242,7 +243,7 @@ export const Render = {
         </div>
 
         <div class="transaction-meta">
-          <p>${Utils.escapeHtml(order.customer.name || 'Pembeli belum diisi')} • ${Utils.escapeHtml(Utils.formatDateTime(order.createdAt))}</p>
+          <p>${Utils.escapeHtml(order.customer.name || 'Pembeli belum diisi')} | ${Utils.escapeHtml(Utils.formatDateTime(order.createdAt))}</p>
           <p>${order.totalQty} item</p>
         </div>
 

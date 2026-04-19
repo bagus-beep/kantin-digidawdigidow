@@ -19,13 +19,13 @@ async function fetchJson(path) {
 function mapPartner(rawPartner) {
   return {
     id: String(rawPartner.mitra_id || ''),
-    name: Utils.compactText(rawPartner.mitra_name || 'Kantin Digital'),
-    ownerName: Utils.compactText(rawPartner.owner_name || ''),
+    name: Utils.presentText(rawPartner.mitra_name || 'Kantin Digital'),
+    ownerName: Utils.presentText(rawPartner.owner_name || ''),
     phone: Utils.compactText(rawPartner.phone_owner || ''),
     email: Utils.compactText(rawPartner.email_owner || ''),
-    category: Utils.compactText(rawPartner.kategori || ''),
-    school: Utils.compactText(rawPartner.sekolah || ''),
-    address: Utils.compactText(rawPartner.address_owner || '')
+    category: Utils.presentText(rawPartner.kategori || ''),
+    school: Utils.presentText(rawPartner.sekolah || ''),
+    address: Utils.presentText(rawPartner.address_owner || '')
   };
 }
 
@@ -35,12 +35,12 @@ function mapProduct(rawProduct, partnersById) {
   return {
     id: String(rawProduct.produk_id || ''),
     partnerId: String(rawProduct.mitra_id || ''),
-    name: Utils.compactText(rawProduct.produk_name || 'Produk tanpa nama'),
+    name: Utils.presentText(rawProduct.produk_name || 'Produk tanpa nama'),
     price: Utils.parseNumber(rawProduct.produk_price),
     stock: Utils.parseNumber(rawProduct.produk_stock),
     category: Utils.compactText(rawProduct.produk_kategori || 'Lainnya').toUpperCase(),
     image: Utils.compactText(rawProduct.produk_image || ''),
-    school: Utils.compactText(rawProduct.sekolah || partner?.school || '')
+    school: Utils.presentText(rawProduct.sekolah || partner?.school || '')
   };
 }
 

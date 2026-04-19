@@ -62,8 +62,9 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Segoe UI Variable", "Trebuchet MS", sans-serif;
+  font-family: Aptos, "Segoe UI Variable", "Trebuchet MS", sans-serif;
   color: var(--color-text);
+  overflow-x: hidden;
   background:
     radial-gradient(circle at top left, rgba(232, 120, 23, 0.16), transparent 34%),
     radial-gradient(circle at right 10% top 20%, rgba(22, 58, 99, 0.12), transparent 28%),
@@ -98,8 +99,10 @@ h1,
 h2,
 h3 {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Aptos Display", Bahnschrift, "Segoe UI Variable", sans-serif;
+  font-weight: 700;
   line-height: 1.05;
+  letter-spacing: -0.03em;
 }
 
 p {
@@ -152,9 +155,9 @@ p {
 
 .app-shell {
   position: relative;
-  width: min(1120px, calc(100% - 24px));
+  width: min(1120px, calc(100% - 16px));
   margin: 0 auto;
-  padding: 20px 0 120px;
+  padding: 20px 0 144px;
 }
 
 .pages {
@@ -165,6 +168,7 @@ p {
 .page {
   display: none;
   gap: var(--space-lg);
+  padding-bottom: 8px;
 }
 
 .page.active {
@@ -201,7 +205,7 @@ p {
 .hero-card {
   display: grid;
   gap: var(--space-lg);
-  padding: clamp(20px, 4vw, 34px);
+  padding: clamp(18px, 4vw, 30px);
   overflow: hidden;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 248, 238, 0.88)),
@@ -216,7 +220,7 @@ html[data-theme="dark"] .hero-card {
 
 .hero-copy {
   display: grid;
-  gap: var(--space-md);
+  gap: 14px;
 }
 
 .eyebrow,
@@ -229,21 +233,27 @@ html[data-theme="dark"] .hero-card {
 }
 
 .hero-card h1 {
-  font-size: clamp(2.2rem, 6vw, 3.6rem);
-  max-width: 12ch;
+  font-size: clamp(2rem, 7vw, 3.2rem);
+  max-width: 10ch;
 }
 
 .hero-tagline {
   max-width: 60ch;
-  font-size: 1.02rem;
-  line-height: 1.7;
+  font-size: 0.98rem;
+  line-height: 1.65;
   color: var(--color-muted);
+  overflow-wrap: anywhere;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
+}
+
+.hero-actions > * {
+  flex: 1 1 180px;
+  min-width: 0;
 }
 
 .button-icon,
@@ -272,6 +282,7 @@ html[data-theme="dark"] .hero-card {
   gap: var(--space-xs);
   min-height: 46px;
   padding: 0 18px;
+  min-width: 0;
   border-radius: var(--radius-pill);
   transition:
     transform var(--transition-fast),
@@ -285,6 +296,7 @@ html[data-theme="dark"] .hero-card {
   color: #fffaf4;
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-strong));
   box-shadow: 0 12px 22px rgba(232, 120, 23, 0.22);
+  white-space: nowrap;
 }
 
 .secondary-button,
@@ -292,6 +304,7 @@ html[data-theme="dark"] .hero-card {
   color: var(--color-secondary);
   background: var(--color-secondary-soft);
   border: 1px solid rgba(22, 58, 99, 0.12);
+  white-space: nowrap;
 }
 
 html[data-theme="dark"] .secondary-button,
@@ -347,10 +360,11 @@ html[data-theme="dark"] .ghost-button {
 
 .hero-stats {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .stat-card {
-  padding: 18px;
+  padding: 16px;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   background: rgba(255, 255, 255, 0.58);
@@ -372,7 +386,8 @@ html[data-theme="dark"] .stat-card {
 }
 
 .stat-card strong {
-  font-size: 1.25rem;
+  font-size: 1.12rem;
+  line-height: 1.25;
 }
 
 .catalog-layout {
@@ -574,7 +589,7 @@ html[data-theme="dark"] .stat-card {
 }
 
 .product-name {
-  font-size: 1.08rem;
+  font-size: 1.02rem;
   line-height: 1.25;
 }
 
@@ -800,23 +815,23 @@ html[data-theme="dark"] .transactions-empty {
 .bottom-nav {
   position: fixed;
   left: 50%;
-  bottom: 16px;
+  bottom: 0;
   z-index: 10;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-xs);
-  width: min(540px, calc(100% - 24px));
-  padding: 10px;
+  width: min(560px, calc(100% - 2px));
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
   border: 1px solid var(--color-border);
-  border-radius: calc(var(--radius-lg) + 2px);
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(22px);
+  border-radius: 24px 24px 0 0;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(22px) saturate(140%);
   box-shadow: var(--shadow-md);
   transform: translateX(-50%);
 }
 
 html[data-theme="dark"] .bottom-nav {
-  background: rgba(20, 30, 45, 0.88);
+  background: rgba(10, 16, 26, 0.97);
 }
 
 .nav-item {
@@ -842,8 +857,9 @@ html[data-theme="dark"] .bottom-nav {
 
 .nav-cart-badge {
   position: absolute;
-  top: 6px;
-  right: 18px;
+  top: 8px;
+  left: 50%;
+  right: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -855,12 +871,13 @@ html[data-theme="dark"] .bottom-nav {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-strong));
   font-size: 0.72rem;
   font-weight: 700;
+  transform: translateX(10px);
 }
 
 .toast {
   position: fixed;
   left: 50%;
-  bottom: 98px;
+  bottom: calc(92px + env(safe-area-inset-bottom));
   z-index: 20;
   padding: 12px 18px;
   border-radius: var(--radius-pill);
@@ -897,8 +914,9 @@ html[data-theme="dark"] .bottom-nav {
 
 @media (max-width: 759px) {
   .app-shell {
-    width: min(520px, calc(100% - 18px));
+    width: min(520px, calc(100% - 12px));
     padding-top: 10px;
+    padding-bottom: 152px;
   }
 
   .section-heading {
@@ -907,18 +925,26 @@ html[data-theme="dark"] .bottom-nav {
 }
 
 @media (max-width: 520px) {
+  .hero-card {
+    gap: 18px;
+  }
+
+  .hero-actions > * {
+    flex-basis: 100%;
+  }
+
   .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .cart-summary {
-    bottom: 96px;
+    bottom: calc(94px + env(safe-area-inset-bottom));
   }
 }
 
 @media (max-width: 390px) {
   .hero-card h1 {
-    font-size: 2rem;
+    font-size: 1.88rem;
   }
 
   .product-grid {
@@ -927,7 +953,7 @@ html[data-theme="dark"] .bottom-nav {
 
   .bottom-nav {
     gap: 4px;
-    padding: 8px;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
   }
 }
 
