@@ -4,11 +4,15 @@ import { Dom } from '../ui/dom.js';
 
 function updateCartFromAction(action, id) {
   if (!id) return;
+  const product = STATE.findProduct(id);
 
   if (action === 'increase') {
-    const product = STATE.findProduct(id);
     if (product && STATE.cartQty(id) >= product.stock) {
-      Dom.showToast(`Stok ${product.name} tidak mencukupi.`);
+      Dom.showToast({
+        tone: 'error',
+        title: 'Stok tidak mencukupi',
+        detail: `${product.name} tidak bisa ditambah lagi.`
+      });
       return;
     }
 
@@ -23,7 +27,11 @@ function updateCartFromAction(action, id) {
 
   if (action === 'remove') {
     STATE.setCartQty(id, 0);
-    Dom.showToast('Produk dihapus dari keranjang.');
+    Dom.showToast({
+      tone: 'info',
+      title: `${product?.name || 'Produk'} dihapus`,
+      detail: `${STATE.cartCount()} item tersisa di keranjang.`
+    });
   }
 }
 
@@ -52,7 +60,11 @@ export const CartFeature = {
       const url = contactUrl(`Halo ${partner?.ownerName || 'penjual'}, saya ingin bertanya tentang menu di ${partner?.name || 'kantin'}.`);
 
       if (!url) {
-        Dom.showToast('Nomor WhatsApp partner belum tersedia.');
+        Dom.showToast({
+          tone: 'error',
+          title: 'Kontak belum tersedia',
+          detail: 'Nomor WhatsApp partner belum tersedia.'
+        });
         return;
       }
 
@@ -86,13 +98,21 @@ export const CartFeature = {
     const totalQty = STATE.cartCount();
 
     if (!items.length) {
-      Dom.showToast('Keranjang masih kosong.');
+      Dom.showToast({
+        tone: 'info',
+        title: 'Keranjang masih kosong',
+        detail: 'Tambahkan produk dulu sebelum checkout.'
+      });
       return;
     }
 
     const phone = Utils.normalizePhone(partner?.phone);
     if (!phone) {
-      Dom.showToast('Nomor WhatsApp partner belum tersedia.');
+      Dom.showToast({
+        tone: 'error',
+        title: 'Checkout belum bisa dibuka',
+        detail: 'Nomor WhatsApp partner belum tersedia.'
+      });
       return;
     }
 
@@ -129,6 +149,10 @@ export const CartFeature = {
     STATE.clearCart();
 
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(messageLines.join('\n'))}`, '_blank', 'noopener,noreferrer');
-    Dom.showToast('Checkout dibuka di WhatsApp.');
+    Dom.showToast({
+      tone: 'success',
+      title: 'Checkout dibuka',
+      detail: 'Pesanan siap dikirim lewat WhatsApp.'
+    });
   }
 };

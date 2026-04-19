@@ -36,14 +36,26 @@ export const ProductFeature = {
         const currentQty = STATE.cartQty(id);
 
         if (product && currentQty >= product.stock) {
-          Dom.showToast(`Stok ${product.name} sudah habis di katalog.`);
+          Dom.showToast({
+            tone: 'error',
+            title: 'Stok tidak cukup',
+            detail: `${product.name} sudah mencapai batas stok yang tersedia.`
+          });
           return;
         }
 
         updateProductQuantity(id, 1);
 
-        if (action === 'add') {
-          Dom.showToast('Produk ditambahkan ke keranjang.');
+        if (action === 'add' && product) {
+          Dom.showToast({
+            tone: 'success',
+            title: `${product.name} ditambahkan`,
+            detail: `${STATE.cartCount()} item di keranjang | ${Utils.formatCurrency(STATE.cartTotal())}`,
+            actionLabel: 'Lihat',
+            onAction: () => {
+              location.hash = 'cart';
+            }
+          });
         }
 
         return;
